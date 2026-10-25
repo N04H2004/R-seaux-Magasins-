@@ -1,0 +1,1225 @@
+{
+ "updated": "2026-10-25",
+ "period": {
+  "start": "2026-09-25",
+  "end": "2026-10-24"
+ },
+ "source": "Instagram Insights via Supermetrics",
+ "stores": [
+  {
+   "id": "netto",
+   "name": "Netto Temple",
+   "handle": "netto.temple",
+   "place": "Place Fontaine du Temple, Nice",
+   "brand": "netto",
+   "followers": 94,
+   "mediaCount": 14,
+   "compare": {
+    "views": 4138,
+    "viewsPrev": 1679,
+    "engaged": 162,
+    "engagedPrev": 78
+   },
+   "daily": [
+    {
+     "date": "2026-09-25",
+     "followers": null,
+     "reach": 8,
+     "views": 28,
+     "engaged": 0
+    },
+    {
+     "date": "2026-09-26",
+     "followers": null,
+     "reach": 17,
+     "views": 89,
+     "engaged": 2
+    },
+    {
+     "date": "2026-09-27",
+     "followers": null,
+     "reach": 10,
+     "views": 48,
+     "engaged": 2
+    },
+    {
+     "date": "2026-09-28",
+     "followers": null,
+     "reach": 32,
+     "views": 69,
+     "engaged": 1
+    },
+    {
+     "date": "2026-09-29",
+     "followers": null,
+     "reach": 48,
+     "views": 110,
+     "engaged": 6
+    },
+    {
+     "date": "2026-09-30",
+     "followers": null,
+     "reach": 46,
+     "views": 187,
+     "engaged": 7
+    },
+    {
+     "date": "2026-10-01",
+     "followers": null,
+     "reach": 14,
+     "views": 514,
+     "engaged": 27
+    },
+    {
+     "date": "2026-10-02",
+     "followers": null,
+     "reach": 8,
+     "views": 152,
+     "engaged": 8
+    },
+    {
+     "date": "2026-10-03",
+     "followers": null,
+     "reach": 8,
+     "views": 89,
+     "engaged": 1
+    },
+    {
+     "date": "2026-10-04",
+     "followers": null,
+     "reach": 8,
+     "views": 69,
+     "engaged": 3
+    },
+    {
+     "date": "2026-10-05",
+     "followers": null,
+     "reach": 30,
+     "views": 71,
+     "engaged": 3
+    },
+    {
+     "date": "2026-10-06",
+     "followers": null,
+     "reach": 11,
+     "views": 46,
+     "engaged": 1
+    },
+    {
+     "date": "2026-10-07",
+     "followers": null,
+     "reach": 37,
+     "views": 137,
+     "engaged": 2
+    },
+    {
+     "date": "2026-10-08",
+     "followers": null,
+     "reach": 12,
+     "views": 551,
+     "engaged": 29
+    },
+    {
+     "date": "2026-10-09",
+     "followers": null,
+     "reach": 7,
+     "views": 533,
+     "engaged": 29
+    },
+    {
+     "date": "2026-10-10",
+     "followers": null,
+     "reach": 2,
+     "views": 89,
+     "engaged": 4
+    },
+    {
+     "date": "2026-10-11",
+     "followers": null,
+     "reach": 1,
+     "views": 86,
+     "engaged": 5
+    },
+    {
+     "date": "2026-10-12",
+     "followers": null,
+     "reach": 35,
+     "views": 146,
+     "engaged": 1
+    },
+    {
+     "date": "2026-10-13",
+     "followers": null,
+     "reach": 9,
+     "views": 78,
+     "engaged": 2
+    },
+    {
+     "date": "2026-10-14",
+     "followers": null,
+     "reach": 4,
+     "views": 77,
+     "engaged": 1
+    },
+    {
+     "date": "2026-10-15",
+     "followers": null,
+     "reach": 2,
+     "views": 38,
+     "engaged": 0
+    },
+    {
+     "date": "2026-10-16",
+     "followers": null,
+     "reach": 1,
+     "views": 51,
+     "engaged": 1
+    },
+    {
+     "date": "2026-10-17",
+     "followers": null,
+     "reach": 0,
+     "views": 11,
+     "engaged": 0
+    },
+    {
+     "date": "2026-10-18",
+     "followers": null,
+     "reach": 0,
+     "views": 9,
+     "engaged": 0
+    },
+    {
+     "date": "2026-10-19",
+     "followers": null,
+     "reach": 3,
+     "views": 27,
+     "engaged": 1
+    },
+    {
+     "date": "2026-10-20",
+     "followers": null,
+     "reach": 2,
+     "views": 28,
+     "engaged": 1
+    },
+    {
+     "date": "2026-10-21",
+     "followers": null,
+     "reach": 119,
+     "views": 243,
+     "engaged": 5
+    },
+    {
+     "date": "2026-10-22",
+     "followers": null,
+     "reach": 251,
+     "views": 419,
+     "engaged": 15
+    },
+    {
+     "date": "2026-10-23",
+     "followers": null,
+     "reach": 17,
+     "views": 64,
+     "engaged": 4
+    },
+    {
+     "date": "2026-10-24",
+     "followers": null,
+     "reach": 4,
+     "views": 79,
+     "engaged": 1
+    }
+   ],
+   "posts": [
+    {
+     "id": "18129656725872091",
+     "time": "2026-10-22 10:21",
+     "format": "Reel",
+     "title": "Octobre Rose : l'équipe mobilisée",
+     "views": 368,
+     "reach": 263,
+     "interactions": 22,
+     "likes": 18,
+     "comments": 2,
+     "saves": 1,
+     "shares": 0,
+     "link": "https://www.instagram.com/reel/Deyilycu-UZ/",
+     "watch": 10,
+     "skip": 59.4
+    },
+    {
+     "id": "18123850891911285",
+     "time": "2026-09-24 14:24",
+     "format": "Reel",
+     "title": "Gyozas poêlés, sauce soja sucrée",
+     "views": 313,
+     "reach": 244,
+     "interactions": 14,
+     "likes": 11,
+     "comments": 0,
+     "saves": 0,
+     "shares": 1,
+     "link": "https://www.instagram.com/reel/Ddq4IYIO1TJ/",
+     "watch": 6,
+     "skip": 88.7
+    },
+    {
+     "id": "18112960874082902",
+     "time": "2026-09-10 11:30",
+     "format": "Photo",
+     "title": "Photo sans légende (10 sept.)",
+     "views": 244,
+     "reach": 73,
+     "interactions": 10,
+     "likes": 10,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/p/DdGhJSvOFKv/",
+     "watch": null,
+     "skip": null
+    },
+    {
+     "id": "18154147312511822",
+     "time": "2026-09-10 09:32",
+     "format": "Carrousel",
+     "title": "Recette n°1 : boulettes de bœuf à la crème",
+     "views": 213,
+     "reach": 67,
+     "interactions": 14,
+     "likes": 14,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/p/DdGTtTIDtjB/",
+     "watch": null,
+     "skip": null
+    },
+    {
+     "id": "18142088107520488",
+     "time": "2026-09-30 11:45",
+     "format": "Carrousel",
+     "title": "Recette n°4 : croque-monsieur gourmand",
+     "views": 189,
+     "reach": 54,
+     "interactions": 9,
+     "likes": 9,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/p/Dd6C0b_DukP/",
+     "watch": null,
+     "skip": null
+    },
+    {
+     "id": "17885859936504766",
+     "time": "2026-10-21 14:19",
+     "format": "Reel",
+     "title": "Gratin de rösti à la mimolette",
+     "views": 188,
+     "reach": 137,
+     "interactions": 5,
+     "likes": 5,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/reel/DewZD-dO5qf/",
+     "watch": 2,
+     "skip": 90.3
+    },
+    {
+     "id": "18137681068722180",
+     "time": "2026-09-17 11:23",
+     "format": "Carrousel",
+     "title": "Recette n°2 : poêlée bœuf et légumes",
+     "views": 186,
+     "reach": 55,
+     "interactions": 11,
+     "likes": 10,
+     "comments": 0,
+     "saves": 1,
+     "shares": 0,
+     "link": "https://www.instagram.com/p/DdYh9zLjpPe/",
+     "watch": null,
+     "skip": null
+    },
+    {
+     "id": "18099603233295999",
+     "time": "2026-09-10 11:30",
+     "format": "Photo",
+     "title": "Photo sans légende (10 sept.)",
+     "views": 169,
+     "reach": 71,
+     "interactions": 15,
+     "likes": 15,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/p/DdGhMv-ueP1/",
+     "watch": null,
+     "skip": null
+    },
+    {
+     "id": "17907866139521131",
+     "time": "2026-09-22 15:11",
+     "format": "Reel",
+     "title": "Les Ramune débarquent au Netto",
+     "views": 168,
+     "reach": 79,
+     "interactions": 11,
+     "likes": 11,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/reel/Ddlz9OvouBa/",
+     "watch": 7,
+     "skip": 70.6
+    },
+    {
+     "id": "18577207054068999",
+     "time": "2026-09-23 14:55",
+     "format": "Carrousel",
+     "title": "Recette n°3 : poulet yakitori",
+     "views": 164,
+     "reach": 52,
+     "interactions": 9,
+     "likes": 9,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/p/DdoXBwaDnlw/",
+     "watch": null,
+     "skip": null
+    },
+    {
+     "id": "18017230985728096",
+     "time": "2026-09-10 11:30",
+     "format": "Photo",
+     "title": "Photo sans légende (10 sept.)",
+     "views": 137,
+     "reach": 67,
+     "interactions": 11,
+     "likes": 11,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/p/DdGhNzuuUK_/",
+     "watch": null,
+     "skip": null
+    },
+    {
+     "id": "17883303897619981",
+     "time": "2026-09-08 10:32",
+     "format": "Photo",
+     "title": "Foire aux vins",
+     "views": 120,
+     "reach": 54,
+     "interactions": 13,
+     "likes": 13,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/p/DdBQ6Oqjmac/",
+     "watch": null,
+     "skip": null
+    },
+    {
+     "id": "18242840755315707",
+     "time": "2026-09-29 20:08",
+     "format": "Reel",
+     "title": "Sodas ou bières ?",
+     "views": 101,
+     "reach": 67,
+     "interactions": 8,
+     "likes": 7,
+     "comments": 0,
+     "saves": 0,
+     "shares": 1,
+     "link": "https://www.instagram.com/reel/Dd4XWNxO83A/",
+     "watch": 5,
+     "skip": 66.7
+    },
+    {
+     "id": "17914486230467433",
+     "time": "2026-10-07 14:50",
+     "format": "Reel",
+     "title": "Recette n°5 : pâtes crémeuses au pesto",
+     "views": 99,
+     "reach": 64,
+     "interactions": 4,
+     "likes": 4,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/reel/DeMZfkUO6fE/",
+     "watch": 4,
+     "skip": 81.5
+    }
+   ],
+   "audience": null,
+   "summary": [
+    "Les vues ont plus que doublé, mais sur une petite base : le compte a démarré le 8 septembre.",
+    "Les plus gros pics (1er, 8 et 9 octobre) tombent des jours sans publication dans le fil : ce sont très probablement des stories.",
+    "Le Reel Octobre Rose avec l'équipe est la meilleure publication, avec le visionnage le plus long.",
+    "Les Reels recettes perdent la plupart des gens dans les premières secondes."
+   ],
+   "recos": [
+    [
+     "Publier au moins 2 fois par semaine",
+     "Pendant la pause de mi-octobre, l'audience est retombée presque à zéro. Un rythme fixe (recette le mardi, produit ou promo le vendredi) vaut mieux que des rafales."
+    ],
+    [
+     "Reels pour se faire découvrir, carrousels pour fidéliser",
+     "Les Reels touchent bien plus de comptes ; les carrousels recettes font davantage réagir les abonnés. Garde les deux."
+    ],
+    [
+     "Soigner les 2 premières secondes des Reels recettes",
+     "Montre le plat fini dès la première image avec le prix total en gros (« un plat pour 4 à moins de 5 € »), puis la décomposition."
+    ],
+    [
+     "Mettre l'équipe en avant",
+     "Le Reel Octobre Rose est le meilleur sur toute la ligne. Des visages connus du quartier accrochent plus qu'une image générée."
+    ],
+    [
+     "Faire des stories régulièrement",
+     "Les pics du mois pointent vers les stories. Publie-en plusieurs par semaine (arrivages, promos du jour, coulisses) et range les meilleures en « À la une »."
+    ],
+    [
+     "Demander explicitement l'action",
+     "Sauvegardes, partages et commentaires sont presque à zéro. Termine chaque recette par « Enregistre-la » ou « Tague la personne avec qui tu la ferais »."
+    ],
+    [
+     "Viser les 100 abonnés",
+     "En dessous, Instagram ne donne ni les gains d'abonnés par jour, ni l'âge et la ville de l'audience, ni ses heures de connexion. Un QR code en caisse ou un petit jeu-concours suffit souvent."
+    ]
+   ]
+  },
+  {
+   "id": "cessole",
+   "name": "Intermarché Cessole",
+   "handle": "intermarche.cessole",
+   "place": "143 boulevard de Cessole, Nice",
+   "brand": "intermarche",
+   "followers": 237,
+   "mediaCount": 28,
+   "compare": {
+    "views": 12645,
+    "viewsPrev": 2379,
+    "engaged": 445,
+    "engagedPrev": 92
+   },
+   "daily": [
+    {
+     "date": "2026-09-25",
+     "followers": 5,
+     "reach": 320,
+     "views": 671,
+     "engaged": 20
+    },
+    {
+     "date": "2026-09-26",
+     "followers": 19,
+     "reach": 431,
+     "views": 1783,
+     "engaged": 71
+    },
+    {
+     "date": "2026-09-27",
+     "followers": 6,
+     "reach": 77,
+     "views": 299,
+     "engaged": 11
+    },
+    {
+     "date": "2026-09-28",
+     "followers": 1,
+     "reach": 95,
+     "views": 277,
+     "engaged": 12
+    },
+    {
+     "date": "2026-09-29",
+     "followers": 2,
+     "reach": 197,
+     "views": 542,
+     "engaged": 21
+    },
+    {
+     "date": "2026-09-30",
+     "followers": 3,
+     "reach": 80,
+     "views": 338,
+     "engaged": 18
+    },
+    {
+     "date": "2026-10-01",
+     "followers": 3,
+     "reach": 265,
+     "views": 918,
+     "engaged": 30
+    },
+    {
+     "date": "2026-10-02",
+     "followers": 3,
+     "reach": 344,
+     "views": 707,
+     "engaged": 26
+    },
+    {
+     "date": "2026-10-03",
+     "followers": 1,
+     "reach": 55,
+     "views": 296,
+     "engaged": 5
+    },
+    {
+     "date": "2026-10-04",
+     "followers": 1,
+     "reach": 36,
+     "views": 154,
+     "engaged": 4
+    },
+    {
+     "date": "2026-10-05",
+     "followers": 0,
+     "reach": 269,
+     "views": 600,
+     "engaged": 23
+    },
+    {
+     "date": "2026-10-06",
+     "followers": 5,
+     "reach": 527,
+     "views": 971,
+     "engaged": 39
+    },
+    {
+     "date": "2026-10-07",
+     "followers": 5,
+     "reach": 343,
+     "views": 996,
+     "engaged": 29
+    },
+    {
+     "date": "2026-10-08",
+     "followers": 2,
+     "reach": 372,
+     "views": 812,
+     "engaged": 30
+    },
+    {
+     "date": "2026-10-09",
+     "followers": 0,
+     "reach": 223,
+     "views": 614,
+     "engaged": 30
+    },
+    {
+     "date": "2026-10-10",
+     "followers": 2,
+     "reach": 48,
+     "views": 204,
+     "engaged": 5
+    },
+    {
+     "date": "2026-10-11",
+     "followers": 0,
+     "reach": 44,
+     "views": 154,
+     "engaged": 6
+    },
+    {
+     "date": "2026-10-12",
+     "followers": 1,
+     "reach": 201,
+     "views": 389,
+     "engaged": 21
+    },
+    {
+     "date": "2026-10-13",
+     "followers": 0,
+     "reach": 110,
+     "views": 245,
+     "engaged": 8
+    },
+    {
+     "date": "2026-10-14",
+     "followers": 0,
+     "reach": 38,
+     "views": 213,
+     "engaged": 1
+    },
+    {
+     "date": "2026-10-15",
+     "followers": 2,
+     "reach": 80,
+     "views": 275,
+     "engaged": 5
+    },
+    {
+     "date": "2026-10-16",
+     "followers": 0,
+     "reach": 25,
+     "views": 94,
+     "engaged": 2
+    },
+    {
+     "date": "2026-10-17",
+     "followers": 0,
+     "reach": 11,
+     "views": 21,
+     "engaged": 1
+    },
+    {
+     "date": "2026-10-18",
+     "followers": 0,
+     "reach": 14,
+     "views": 28,
+     "engaged": 0
+    },
+    {
+     "date": "2026-10-19",
+     "followers": 1,
+     "reach": 18,
+     "views": 55,
+     "engaged": 2
+    },
+    {
+     "date": "2026-10-20",
+     "followers": 2,
+     "reach": 15,
+     "views": 48,
+     "engaged": 0
+    },
+    {
+     "date": "2026-10-21",
+     "followers": 0,
+     "reach": 113,
+     "views": 241,
+     "engaged": 7
+    },
+    {
+     "date": "2026-10-22",
+     "followers": 2,
+     "reach": 22,
+     "views": 90,
+     "engaged": 2
+    },
+    {
+     "date": "2026-10-23",
+     "followers": 0,
+     "reach": 15,
+     "views": 120,
+     "engaged": 1
+    },
+    {
+     "date": "2026-10-24",
+     "followers": 0,
+     "reach": 204,
+     "views": 490,
+     "engaged": 15
+    }
+   ],
+   "posts": [
+    {
+     "id": "18092759651416284",
+     "time": "2026-09-26 09:42",
+     "format": "Reel",
+     "title": "La Tribu Intermarché",
+     "views": 1275,
+     "reach": 481,
+     "interactions": 137,
+     "likes": 75,
+     "comments": 14,
+     "saves": 4,
+     "shares": 39,
+     "link": "https://www.instagram.com/reel/DdvhZjXsi6m/",
+     "watch": 30,
+     "skip": 58.5
+    },
+    {
+     "id": "17872887045638542",
+     "time": "2026-10-05 19:50",
+     "format": "Reel",
+     "title": "Panier apéro à moins de 10 €",
+     "views": 1095,
+     "reach": 664,
+     "interactions": 58,
+     "likes": 43,
+     "comments": 1,
+     "saves": 0,
+     "shares": 13,
+     "link": "https://www.instagram.com/reel/DeHx4vrsAfb/",
+     "watch": 16,
+     "skip": 59.7
+    },
+    {
+     "id": "18150605239556844",
+     "time": "2026-10-06 18:31",
+     "format": "Reel",
+     "title": "Dégustation : croustillant du traiteur asiatique",
+     "views": 983,
+     "reach": 615,
+     "interactions": 62,
+     "likes": 42,
+     "comments": 1,
+     "saves": 0,
+     "shares": 18,
+     "link": "https://www.instagram.com/reel/DeKNrRVMTuJ/",
+     "watch": 16,
+     "skip": 56.6
+    },
+    {
+     "id": "17957039604080610",
+     "time": "2026-10-01 14:51",
+     "format": "Reel",
+     "title": "Réunion annuelle, objectif 2027",
+     "views": 915,
+     "reach": 438,
+     "interactions": 46,
+     "likes": 40,
+     "comments": 0,
+     "saves": 0,
+     "shares": 4,
+     "link": "https://www.instagram.com/reel/Dd880XSMH5v/",
+     "watch": 19,
+     "skip": 50.8
+    },
+    {
+     "id": "18109009073269662",
+     "time": "2026-10-08 16:42",
+     "format": "Reel",
+     "title": "À la rencontre de nos collaborateurs",
+     "views": 882,
+     "reach": 498,
+     "interactions": 44,
+     "likes": 37,
+     "comments": 2,
+     "saves": 0,
+     "shares": 4,
+     "link": "https://www.instagram.com/reel/DePK_6jML19/",
+     "watch": 21,
+     "skip": 62.3
+    },
+    {
+     "id": "18113204197834823",
+     "time": "2026-09-25 12:13",
+     "format": "Reel",
+     "title": "POV : tu venais juste chercher des pâtes",
+     "views": 739,
+     "reach": 454,
+     "interactions": 27,
+     "likes": 21,
+     "comments": 0,
+     "saves": 2,
+     "shares": 4,
+     "link": "https://www.instagram.com/reel/DdtN7xXsdTH/",
+     "watch": 9,
+     "skip": 44.4
+    },
+    {
+     "id": "18142032055592302",
+     "time": "2026-10-09 09:29",
+     "format": "Carrousel",
+     "title": "Jogging Rose avec les équipes",
+     "views": 644,
+     "reach": 209,
+     "interactions": 35,
+     "likes": 33,
+     "comments": 2,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/p/DeQ-Y0ojUlj/",
+     "watch": null,
+     "skip": null
+    },
+    {
+     "id": "18118045889019771",
+     "time": "2026-09-29 02:25",
+     "format": "Reel",
+     "title": "Panier veggie et bio à moins de 10 €",
+     "views": 601,
+     "reach": 334,
+     "interactions": 35,
+     "likes": 29,
+     "comments": 0,
+     "saves": 0,
+     "shares": 4,
+     "link": "https://www.instagram.com/reel/Dd1o5vvs_jI/",
+     "watch": 15,
+     "skip": 63.7
+    },
+    {
+     "id": "18039170216835343",
+     "time": "2026-09-21 11:00",
+     "format": "Reel",
+     "title": "Panier à 9,98 € pour 6 repas",
+     "views": 500,
+     "reach": 296,
+     "interactions": 22,
+     "likes": 21,
+     "comments": 0,
+     "saves": 0,
+     "shares": 1,
+     "link": "https://www.instagram.com/reel/DdiyVNZM3U4/",
+     "watch": 12,
+     "skip": 68.9
+    },
+    {
+     "id": "18123698134906949",
+     "time": "2026-10-12 20:10",
+     "format": "Reel",
+     "title": "Brunch gourmand à moins de 10 €",
+     "views": 484,
+     "reach": 303,
+     "interactions": 31,
+     "likes": 29,
+     "comments": 0,
+     "saves": 0,
+     "shares": 1,
+     "link": "https://www.instagram.com/reel/DeZ2A6Esg6E/",
+     "watch": 16,
+     "skip": 58.5
+    },
+    {
+     "id": "18267985204305668",
+     "time": "2026-10-02 19:48",
+     "format": "Reel",
+     "title": "Le hasard fait les courses (la roue)",
+     "views": 469,
+     "reach": 296,
+     "interactions": 24,
+     "likes": 18,
+     "comments": 0,
+     "saves": 0,
+     "shares": 5,
+     "link": "https://www.instagram.com/reel/DeACiPPsjCa/",
+     "watch": 13,
+     "skip": 64.8
+    },
+    {
+     "id": "17933577702401217",
+     "time": "2026-09-24 14:22",
+     "format": "Reel",
+     "title": "3 articles, 1 seul rayon",
+     "views": 429,
+     "reach": 224,
+     "interactions": 26,
+     "likes": 23,
+     "comments": 2,
+     "saves": 0,
+     "shares": 1,
+     "link": "https://www.instagram.com/reel/Ddq35KGMqng/",
+     "watch": 15,
+     "skip": 70.5
+    },
+    {
+     "id": "18018634421733056",
+     "time": "2026-09-26 11:47",
+     "format": "Reel",
+     "title": "Raclette, tartiflette ou Mont d'Or ?",
+     "views": 419,
+     "reach": 184,
+     "interactions": 24,
+     "likes": 22,
+     "comments": 0,
+     "saves": 0,
+     "shares": 1,
+     "link": "https://www.instagram.com/reel/DdvvyFQM2-L/",
+     "watch": 6,
+     "skip": 60.8
+    },
+    {
+     "id": "17902409727578779",
+     "time": "2026-09-09 15:00",
+     "format": "Reel",
+     "title": "Soirée d'avant-première Foire aux vins",
+     "views": 404,
+     "reach": 177,
+     "interactions": 20,
+     "likes": 20,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/reel/DdEUUjnsegv/",
+     "watch": 10,
+     "skip": 65.7
+    },
+    {
+     "id": "18179878018426951",
+     "time": "2026-09-23 14:59",
+     "format": "Carrousel",
+     "title": "Recette : fajitas au bœuf",
+     "views": 354,
+     "reach": 106,
+     "interactions": 22,
+     "likes": 22,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/p/DdoXb1fDCGn/",
+     "watch": null,
+     "skip": null
+    },
+    {
+     "id": "17938720215391703",
+     "time": "2026-10-24 21:40",
+     "format": "Reel",
+     "title": "Nouvelles baguettes goûtées par les clients",
+     "views": 348,
+     "reach": 217,
+     "interactions": 23,
+     "likes": 21,
+     "comments": 0,
+     "saves": 0,
+     "shares": 1,
+     "link": "https://www.instagram.com/reel/De45Pa8xAYg/",
+     "watch": 18,
+     "skip": 61.4
+    },
+    {
+     "id": "17896326705405892",
+     "time": "2026-09-30 11:50",
+     "format": "Carrousel",
+     "title": "Recette : pâtes Boursin, lardons, gruyère",
+     "views": 329,
+     "reach": 104,
+     "interactions": 15,
+     "likes": 14,
+     "comments": 1,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/p/Dd6DW4CjO-N/",
+     "watch": null,
+     "skip": null
+    },
+    {
+     "id": "18122484142921035",
+     "time": "2026-09-29 20:15",
+     "format": "Reel",
+     "title": "Les Celsius arrivent",
+     "views": 308,
+     "reach": 152,
+     "interactions": 15,
+     "likes": 13,
+     "comments": 1,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/reel/Dd4YGy6MMGw/",
+     "watch": 5,
+     "skip": 72.5
+    },
+    {
+     "id": "18072811895481822",
+     "time": "2026-09-22 15:08",
+     "format": "Reel",
+     "title": "Les shots Yumi",
+     "views": 303,
+     "reach": 139,
+     "interactions": 17,
+     "likes": 17,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/reel/DdlzmBtsaz0/",
+     "watch": 5,
+     "skip": 71.1
+    },
+    {
+     "id": "18137176807619360",
+     "time": "2026-09-09 11:39",
+     "format": "Photo",
+     "title": "Koh-Lanta débarque au magasin",
+     "views": 262,
+     "reach": 98,
+     "interactions": 11,
+     "likes": 11,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/p/DdD89pYMmjv/",
+     "watch": null,
+     "skip": null
+    },
+    {
+     "id": "18134274196708723",
+     "time": "2026-10-07 14:46",
+     "format": "Reel",
+     "title": "Recette : raviolis gratinés",
+     "views": 252,
+     "reach": 124,
+     "interactions": 10,
+     "likes": 10,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/reel/DeMZCPcsjcL/",
+     "watch": 5,
+     "skip": 69.6
+    },
+    {
+     "id": "18030158414675012",
+     "time": "2026-09-08 15:04",
+     "format": "Reel",
+     "title": "Offre Foire aux vins",
+     "views": 209,
+     "reach": 103,
+     "interactions": 13,
+     "likes": 12,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/reel/DdBvtw7s-gL/",
+     "watch": 4,
+     "skip": 81.0
+    },
+    {
+     "id": "18079502660397067",
+     "time": "2026-10-21 14:17",
+     "format": "Reel",
+     "title": "Recette : tortellini gratinés",
+     "views": 168,
+     "reach": 86,
+     "interactions": 5,
+     "likes": 5,
+     "comments": 0,
+     "saves": 0,
+     "shares": 0,
+     "link": "https://www.instagram.com/reel/DewY4PEsOt6/",
+     "watch": 4,
+     "skip": 67.0
+    }
+   ],
+   "audience": {
+    "hours": [
+     24.0714,
+     14.3929,
+     9.9286,
+     7.0357,
+     8,
+     12.5714,
+     21.2143,
+     34.9643,
+     42.5714,
+     47.5,
+     48.2857,
+     51,
+     56.1071,
+     58,
+     53.5357,
+     54.9643,
+     55.0714,
+     57.75,
+     59.6786,
+     61.0714,
+     61.3571,
+     63.8929,
+     53.1071,
+     38.1429
+    ],
+    "ages": [
+     [
+      "13-17",
+      2
+     ],
+     [
+      "18-24",
+      35
+     ],
+     [
+      "25-34",
+      69
+     ],
+     [
+      "35-44",
+      52
+     ],
+     [
+      "45-54",
+      41
+     ],
+     [
+      "55-64",
+      26
+     ],
+     [
+      "65+",
+      10
+     ]
+    ],
+    "cities": [
+     [
+      "Nice",
+      106
+     ],
+     [
+      "Paris",
+      5
+     ],
+     [
+      "Abidjan",
+      4
+     ],
+     [
+      "Marseille",
+      3
+     ],
+     [
+      "Antony",
+      2
+     ],
+     [
+      "Cagnes-sur-Mer",
+      2
+     ],
+     [
+      "Châtenay-Malabry",
+      2
+     ],
+     [
+      "Clamart",
+      2
+     ]
+    ]
+   },
+   "summary": [
+    "Forte progression, portée par le rythme : 16 publications en 30 jours, contre 7 le mois d'avant.",
+    "Meilleure journée en abonnés : le 26 septembre, jour du Reel « La Tribu Intermarché », ton meilleur contenu sur toute la ligne.",
+    "Les vidéos d'équipe et la série « Panier à moins de 10 € » marchent le mieux ; les Reels recettes et les simples présentations de produits, le moins.",
+    "La pause du 13 au 20 octobre a fait chuter les vues et quasiment arrêté les gains d'abonnés."
+   ],
+   "recos": [
+    [
+     "Faire de l'équipe le cœur du compte",
+     "« La Tribu Intermarché » est le plus vu, le plus partagé, le plus commenté et le plus regardé. Lance un rendez-vous fixe chaque semaine : un portrait, un métier, une coulisse."
+    ],
+    [
+     "Faire du « Panier à moins de 10 € » une vraie série",
+     "Chaque épisode marche, et le panier apéro a la plus grande portée du compte. Même titre, même mise en scène, jour fixe."
+    ],
+    [
+     "Repenser les Reels recettes",
+     "Tortellini et raviolis sont en bas du classement. Les recettes marchent mieux en carrousel, ou tournées en dégustation avec quelqu'un de l'équipe."
+    ],
+    [
+     "Montrer des gens plutôt que des produits",
+     "Les nouveautés présentées seules (Celsius, Yumi) sont peu vues ; les baguettes goûtées par des clients font nettement mieux."
+    ],
+    [
+     "Ne pas couper le rythme",
+     "Vise 3 à 4 publications par semaine, programmées à l'avance, pour éviter un nouveau creux comme mi-octobre."
+    ],
+    [
+     "Publier en soirée",
+     "Tes abonnés sont le plus connectés entre 19 h et 22 h, avec un second pic au déjeuner. Programme les Reels vers 18 h 30 - 19 h."
+    ],
+    [
+     "Encourager les partages",
+     "Les vidéos d'équipe sont très partagées. Demande à l'équipe de repartager en story à chaque fois : c'est ta meilleure source d'abonnés locaux."
+    ]
+   ]
+  }
+ ]
+}

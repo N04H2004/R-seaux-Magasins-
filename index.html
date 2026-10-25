@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Insta Magasins</title>
+<meta name="description" content="Statistiques Instagram des magasins, 30 derniers jours">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: sticky store bar, then one column of sections; KPIs printed as a till receipt. */
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --ink: #16191f;
+  --muted: #5d6573;
+  --line: #dde0e6;
+  --grid: #eceef2;
+  --bar-muted: #c9ced8;
+  --good: #1b7a46;
+  --bad: #b3261e;
+  --accent: #d6001c;          /* per store, set below */
+  --accent-ink: #b10017;
+  --accent-soft: #fde8ea;
+  --on-accent: #ffffff;
+  --font-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 10px;
+}
+:root[data-brand="netto"] { --accent: #f2c500; --accent-ink: #7a6200; --accent-soft: #fdf5cc; --on-accent: #16191f; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111318; --surface: #1a1d24; --ink: #eef0f4; --muted: #a2a9b6; --line: #2c313b; --grid: #232731; --bar-muted: #3d4350;
+    --good: #5fd08d; --bad: #ff8a80; --accent: #ff3b4f; --accent-ink: #ff7d8a; --accent-soft: #3a1a20; --on-accent: #ffffff; color-scheme: dark;
+  }
+  :root:not([data-theme="light"])[data-brand="netto"] { --accent: #f2c500; --accent-ink: #f5d64d; --accent-soft: #352e0c; --on-accent: #16191f; }
+}
+:root[data-theme="dark"] {
+  --bg: #111318; --surface: #1a1d24; --ink: #eef0f4; --muted: #a2a9b6; --line: #2c313b; --grid: #232731; --bar-muted: #3d4350;
+  --good: #5fd08d; --bad: #ff8a80; --accent: #ff3b4f; --accent-ink: #ff7d8a; --accent-soft: #3a1a20; --on-accent: #ffffff; color-scheme: dark;
+}
+:root[data-theme="dark"][data-brand="netto"] { --accent: #f2c500; --accent-ink: #f5d64d; --accent-soft: #352e0c; --on-accent: #16191f; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+a { color: var(--accent-ink); }
+:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+.bar-in, .wrap { max-width: 1120px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.bar-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding-block: 12px; }
+.logo { font-family: var(--font-display); font-weight: 800; font-stretch: 75%; font-size: 22px; letter-spacing: 0.01em; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+.logo i { width: 12px; height: 22px; background: var(--accent); border-radius: 2px; display: inline-block; transition: background .2s; }
+.switch { display: flex; gap: 4px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 4px; max-width: 100%; overflow-x: auto; }
+.switch button { font: 600 14px/1 var(--font-body); color: var(--muted); background: transparent; border: 0; border-radius: 999px; padding: 9px 16px; cursor: pointer; white-space: nowrap; }
+.switch button:hover { color: var(--ink); }
+.switch button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.wrap { display: flex; flex-direction: column; gap: 28px; padding-block: 28px 56px; }
+.hero { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.hero h1 { font-family: var(--font-display); font-weight: 800; font-stretch: 75%; font-size: clamp(34px, 6vw, 56px); line-height: 0.95; letter-spacing: -0.01em; margin: 0; text-transform: uppercase; text-wrap: balance; }
+.hero .meta { color: var(--muted); font-size: 14px; display: flex; flex-direction: column; gap: 2px; }
+.hero .meta b { color: var(--ink); font-weight: 600; }
+.period { font-family: var(--font-mono); font-size: 13px; color: var(--muted); text-align: right; }
+
+/* receipt */
+.ticket { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); font-family: var(--font-mono); overflow: hidden; }
+.ticket-head { display: flex; justify-content: space-between; gap: 12px; padding: 12px 18px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); border-bottom: 1px dashed var(--line); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); }
+.kpi { padding: 16px 18px 18px; border-right: 1px dashed var(--line); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.kpi:last-child { border-right: 0; }
+.kpi .l { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.kpi .v { font-family: var(--font-display); font-weight: 700; font-stretch: 85%; font-size: 38px; line-height: 1; font-variant-numeric: tabular-nums; }
+.kpi .s { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.up { color: var(--good); font-weight: 500; }
+.down { color: var(--bad); font-weight: 500; }
+
+.summary { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; }
+.summary li { background: var(--accent-soft); border-radius: var(--radius); padding: 14px 16px; font-size: 14.5px; line-height: 1.45; }
+
+.sec-title { font-family: var(--font-display); font-weight: 700; font-stretch: 80%; font-size: 24px; text-transform: uppercase; letter-spacing: 0.01em; margin: 8px 0 -12px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px 20px; min-width: 0; }
+.card h3 { font-size: 16px; font-weight: 600; margin: 0; }
+.card .note { font-size: 13px; color: var(--muted); margin: 4px 0 14px; max-width: 70ch; }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.tick { fill: var(--muted); font: 11px var(--font-mono); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.legend i.dot { border-radius: 50%; background: var(--ink); }
+.legend i.bar { background: var(--accent); }
+.tip { position: absolute; top: 0; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.12); padding: 8px 10px; font-size: 12.5px; line-height: 1.4; max-width: 240px; z-index: 2; }
+.tip .k { color: var(--muted); font-family: var(--font-mono); font-size: 11.5px; }
+.empty { font-size: 13.5px; color: var(--muted); background: var(--bg); border-radius: 8px; padding: 14px 16px; margin: 0; }
+
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.list li { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+.list li:last-child { border-bottom: 0; }
+.list .d { font-weight: 500; }
+.list .m { font-size: 12.5px; color: var(--muted); }
+.list .n { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 14px; }
+.list .n b { font-family: var(--font-display); font-stretch: 85%; font-size: 22px; font-weight: 700; }
+
+.hbars { display: flex; flex-direction: column; gap: 12px; }
+.hrow .lbl { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; margin-bottom: 4px; }
+.hrow .lbl span:last-child { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--muted); }
+.hrow .lbl b { color: var(--ink); font-weight: 500; }
+.track { height: 12px; border-radius: 3px; background: var(--grid); overflow: hidden; }
+.fill { height: 100%; border-radius: 3px; background: var(--bar-muted); }
+.fill.hl { background: var(--accent); }
+
+.tops { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; }
+.top { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; background: var(--surface); min-width: 0; }
+.top .rank { font-family: var(--font-display); font-weight: 800; font-stretch: 75%; font-size: 15px; color: var(--accent-ink); letter-spacing: 0.06em; text-transform: uppercase; }
+.top .t { font-weight: 600; font-size: 15px; line-height: 1.3; }
+.top .t a { color: var(--ink); text-decoration-color: var(--line); }
+.top .stats { display: flex; flex-wrap: wrap; gap: 4px 14px; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+.top .stats b { color: var(--ink); font-weight: 500; }
+.pill { display: inline-block; font: 600 11px/1 var(--font-body); padding: 4px 7px; border-radius: 4px; background: var(--grid); color: var(--muted); letter-spacing: 0.02em; }
+
+.table-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.table-tools input { font: 14px var(--font-body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; width: min(100%, 280px); }
+.tbl-wrap { overflow-x: auto; max-height: 560px; overflow-y: auto; border-top: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+th { position: sticky; top: 0; background: var(--surface); text-align: left; font-weight: 600; font-size: 12px; color: var(--muted); border-bottom: 1px solid var(--line); padding: 0; z-index: 1; }
+th button { all: unset; cursor: pointer; display: block; padding: 10px 10px; white-space: nowrap; }
+th button:focus-visible { outline: 2px solid var(--accent-ink); }
+th[aria-sort="ascending"] button::after { content: " ↑"; }
+th[aria-sort="descending"] button::after { content: " ↓"; }
+td { padding: 9px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+td.num, th.num { text-align: right; }
+td.num { font-family: var(--font-mono); font-size: 13px; }
+td.t { min-width: 220px; }
+td.t a { color: var(--ink); text-decoration-color: var(--line); }
+td.t a:hover { text-decoration-color: var(--accent-ink); }
+tr.old td { color: var(--muted); }
+tr.old td.t a { color: var(--muted); }
+.new { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 6px; vertical-align: 1px; }
+
+.recos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; counter-reset: r; }
+.recos li { counter-increment: r; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; }
+.recos li::before { content: counter(r); grid-row: span 2; font-family: var(--font-display); font-weight: 800; font-stretch: 75%; font-size: 30px; line-height: 1; color: var(--accent-ink); }
+.recos b { font-weight: 600; }
+.recos p { margin: 0; font-size: 14px; color: var(--muted); grid-column: 2; }
+
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 16px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+@media (max-width: 640px) {
+  .kpi { border-right: 0; border-bottom: 1px dashed var(--line); }
+  .kpi:last-child { border-bottom: 0; }
+  .hide-sm { display: none; }
+  .period { text-align: left; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .logo i, .switch button { transition: background .2s, color .2s; }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <div class="logo"><i></i>Insta Magasins</div>
+    <nav class="switch" id="switch" aria-label="Choisir le magasin"></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h1 id="store-name">—</h1>
+      <div class="meta"><span><b id="store-handle">—</b> · <span id="store-place">—</span></span></div>
+    </div>
+    <div class="period" id="period">—</div>
+  </section>
+
+  <section class="ticket" aria-label="Chiffres clés">
+    <div class="ticket-head"><span>Ticket · 30 derniers jours</span><span id="ticket-date">—</span></div>
+    <div class="kpis" id="kpis"></div>
+  </section>
+
+  <ul class="summary" id="summary"></ul>
+
+  <h2 class="sec-title">Activité</h2>
+  <section class="card">
+    <h3>Vues par jour</h3>
+    <p class="note">Vues de tout le contenu (publications, Reels et stories). Un point sous une barre signale une publication ce jour-là dans le fil. Survole ou touche une barre pour le détail.</p>
+    <div class="chart" id="chart-views"><div class="tip" hidden></div></div>
+    <div class="legend"><span><i class="bar"></i>Vues de contenu</span><span><i class="dot"></i>Publication dans le fil</span></div>
+  </section>
+
+  <section class="card">
+    <h3>Nouveaux abonnés par jour</h3>
+    <p class="note">Abonnés gagnés chaque jour, avec les publications du jour.</p>
+    <div class="chart" id="chart-followers"><div class="tip" hidden></div></div>
+    <p class="empty" id="followers-empty" hidden>Instagram ne donne les nouveaux abonnés par jour qu'à partir de 100 abonnés. Pour ce magasin, les pics de vues ci-dessous servent d'indicateur.</p>
+  </section>
+
+  <div class="grid2">
+    <section class="card">
+      <h3>Les plus gros pics de vues</h3>
+      <p class="note">Quand rien n'est sorti dans le fil ce jour-là, le pic vient très probablement d'une story.</p>
+      <ul class="list" id="peaks"></ul>
+    </section>
+    <section class="card" id="card-fpeaks">
+      <h3>Les journées qui ont rapporté des abonnés</h3>
+      <p class="note">Les 3 meilleurs jours et ce qui a été publié.</p>
+      <ul class="list" id="fpeaks"></ul>
+    </section>
+    <section class="card">
+      <h3>Le creux du mois</h3>
+      <p class="note">La plus longue période sans publication dans le fil.</p>
+      <ul class="list" id="gap"></ul>
+    </section>
+  </div>
+
+  <h2 class="sec-title">Ce qui marche</h2>
+  <section>
+    <div class="tops" id="tops"></div>
+  </section>
+
+  <div class="grid2">
+    <section class="card">
+      <h3>Portée moyenne par format</h3>
+      <p class="note">Comptes touchés en moyenne par publication, et taux d'interaction (likes, commentaires, sauvegardes et partages ÷ comptes touchés). Toutes les publications du compte.</p>
+      <div class="hbars" id="formats"></div>
+    </section>
+    <section class="card">
+      <h3>Interactions qui comptent</h3>
+      <p class="note">Commentaires, sauvegardes et partages pèsent bien plus que les likes pour l'algorithme. Total sur toutes les publications.</p>
+      <ul class="list" id="deep"></ul>
+    </section>
+  </div>
+
+  <section class="card">
+    <h3>Toutes les publications</h3>
+    <p class="note">Le point de couleur marque les publications des 30 derniers jours. Visionnage moyen et swipe immédiat (part des gens qui passent dans les premières secondes) concernent les Reels.</p>
+    <div class="table-tools">
+      <input id="search" type="search" placeholder="Rechercher une publication" aria-label="Rechercher une publication">
+      <span class="note" id="count" style="margin:0"></span>
+    </div>
+    <div class="tbl-wrap">
+      <table id="table">
+        <thead><tr>
+          <th data-k="time"><button>Date</button></th>
+          <th data-k="title"><button>Publication</button></th>
+          <th data-k="format" class="hide-sm"><button>Format</button></th>
+          <th data-k="views" class="num"><button>Vues</button></th>
+          <th data-k="reach" class="num"><button>Touchés</button></th>
+          <th data-k="rate" class="num"><button>Taux</button></th>
+          <th data-k="shares" class="num hide-sm"><button>Partages</button></th>
+          <th data-k="watch" class="num hide-sm"><button>Visionnage</button></th>
+          <th data-k="skip" class="num hide-sm"><button>Swipe</button></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <h2 class="sec-title" id="aud-title">Audience</h2>
+  <p class="empty" id="aud-empty" hidden>Instagram ne fournit les heures de connexion, l'âge et la ville des abonnés qu'à partir de 100 abonnés.</p>
+  <div class="grid2" id="aud-grid">
+    <section class="card">
+      <h3>Quand les abonnés sont en ligne</h3>
+      <p class="note">Abonnés connectés en moyenne à chaque heure (heure de Paris). Les 3 meilleures heures sont en couleur : publie juste avant.</p>
+      <div class="chart" id="chart-hours"><div class="tip" hidden></div></div>
+    </section>
+    <section class="card">
+      <h3>Âge des abonnés</h3>
+      <p class="note">Nombre d'abonnés par tranche d'âge.</p>
+      <div class="hbars" id="ages"></div>
+    </section>
+    <section class="card">
+      <h3>Villes des abonnés</h3>
+      <p class="note">Les villes qui comptent le plus d'abonnés.</p>
+      <div class="hbars" id="cities"></div>
+    </section>
+  </div>
+
+  <h2 class="sec-title">Recommandations</h2>
+  <ol class="recos" id="recos"></ol>
+
+  <footer>
+    <span id="source">—</span>
+    <span>Les statistiques des stories ne sont pas conservées après 24 h.</span>
+  </footer>
+</main>
+
+<script id="data" type="application/json">{"updated": "2026-10-25", "period": {"start": "2026-09-25", "end": "2026-10-24"}, "source": "Instagram Insights via Supermetrics", "stores": [{"id": "netto", "name": "Netto Temple", "handle": "netto.temple", "place": "Place Fontaine du Temple, Nice", "brand": "netto", "followers": 94, "mediaCount": 14, "compare": {"views": 4138, "viewsPrev": 1679, "engaged": 162, "engagedPrev": 78}, "daily": [{"date": "2026-09-25", "followers": null, "reach": 8, "views": 28, "engaged": 0}, {"date": "2026-09-26", "followers": null, "reach": 17, "views": 89, "engaged": 2}, {"date": "2026-09-27", "followers": null, "reach": 10, "views": 48, "engaged": 2}, {"date": "2026-09-28", "followers": null, "reach": 32, "views": 69, "engaged": 1}, {"date": "2026-09-29", "followers": null, "reach": 48, "views": 110, "engaged": 6}, {"date": "2026-09-30", "followers": null, "reach": 46, "views": 187, "engaged": 7}, {"date": "2026-10-01", "followers": null, "reach": 14, "views": 514, "engaged": 27}, {"date": "2026-10-02", "followers": null, "reach": 8, "views": 152, "engaged": 8}, {"date": "2026-10-03", "followers": null, "reach": 8, "views": 89, "engaged": 1}, {"date": "2026-10-04", "followers": null, "reach": 8, "views": 69, "engaged": 3}, {"date": "2026-10-05", "followers": null, "reach": 30, "views": 71, "engaged": 3}, {"date": "2026-10-06", "followers": null, "reach": 11, "views": 46, "engaged": 1}, {"date": "2026-10-07", "followers": null, "reach": 37, "views": 137, "engaged": 2}, {"date": "2026-10-08", "followers": null, "reach": 12, "views": 551, "engaged": 29}, {"date": "2026-10-09", "followers": null, "reach": 7, "views": 533, "engaged": 29}, {"date": "2026-10-10", "followers": null, "reach": 2, "views": 89, "engaged": 4}, {"date": "2026-10-11", "followers": null, "reach": 1, "views": 86, "engaged": 5}, {"date": "2026-10-12", "followers": null, "reach": 35, "views": 146, "engaged": 1}, {"date": "2026-10-13", "followers": null, "reach": 9, "views": 78, "engaged": 2}, {"date": "2026-10-14", "followers": null, "reach": 4, "views": 77, "engaged": 1}, {"date": "2026-10-15", "followers": null, "reach": 2, "views": 38, "engaged": 0}, {"date": "2026-10-16", "followers": null, "reach": 1, "views": 51, "engaged": 1}, {"date": "2026-10-17", "followers": null, "reach": 0, "views": 11, "engaged": 0}, {"date": "2026-10-18", "followers": null, "reach": 0, "views": 9, "engaged": 0}, {"date": "2026-10-19", "followers": null, "reach": 3, "views": 27, "engaged": 1}, {"date": "2026-10-20", "followers": null, "reach": 2, "views": 28, "engaged": 1}, {"date": "2026-10-21", "followers": null, "reach": 119, "views": 243, "engaged": 5}, {"date": "2026-10-22", "followers": null, "reach": 251, "views": 419, "engaged": 15}, {"date": "2026-10-23", "followers": null, "reach": 17, "views": 64, "engaged": 4}, {"date": "2026-10-24", "followers": null, "reach": 4, "views": 79, "engaged": 1}], "posts": [{"id": "18129656725872091", "time": "2026-10-22 10:21", "format": "Reel", "title": "Octobre Rose : l'équipe mobilisée", "views": 368, "reach": 263, "interactions": 22, "likes": 18, "comments": 2, "saves": 1, "shares": 0, "link": "https://www.instagram.com/reel/Deyilycu-UZ/", "watch": 10, "skip": 59.4}, {"id": "18123850891911285", "time": "2026-09-24 14:24", "format": "Reel", "title": "Gyozas poêlés, sauce soja sucrée", "views": 313, "reach": 244, "interactions": 14, "likes": 11, "comments": 0, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/Ddq4IYIO1TJ/", "watch": 6, "skip": 88.7}, {"id": "18112960874082902", "time": "2026-09-10 11:30", "format": "Photo", "title": "Photo sans légende (10 sept.)", "views": 244, "reach": 73, "interactions": 10, "likes": 10, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdGhJSvOFKv/", "watch": null, "skip": null}, {"id": "18154147312511822", "time": "2026-09-10 09:32", "format": "Carrousel", "title": "Recette n°1 : boulettes de bœuf à la crème", "views": 213, "reach": 67, "interactions": 14, "likes": 14, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdGTtTIDtjB/", "watch": null, "skip": null}, {"id": "18142088107520488", "time": "2026-09-30 11:45", "format": "Carrousel", "title": "Recette n°4 : croque-monsieur gourmand", "views": 189, "reach": 54, "interactions": 9, "likes": 9, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/Dd6C0b_DukP/", "watch": null, "skip": null}, {"id": "17885859936504766", "time": "2026-10-21 14:19", "format": "Reel", "title": "Gratin de rösti à la mimolette", "views": 188, "reach": 137, "interactions": 5, "likes": 5, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DewZD-dO5qf/", "watch": 2, "skip": 90.3}, {"id": "18137681068722180", "time": "2026-09-17 11:23", "format": "Carrousel", "title": "Recette n°2 : poêlée bœuf et légumes", "views": 186, "reach": 55, "interactions": 11, "likes": 10, "comments": 0, "saves": 1, "shares": 0, "link": "https://www.instagram.com/p/DdYh9zLjpPe/", "watch": null, "skip": null}, {"id": "18099603233295999", "time": "2026-09-10 11:30", "format": "Photo", "title": "Photo sans légende (10 sept.)", "views": 169, "reach": 71, "interactions": 15, "likes": 15, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdGhMv-ueP1/", "watch": null, "skip": null}, {"id": "17907866139521131", "time": "2026-09-22 15:11", "format": "Reel", "title": "Les Ramune débarquent au Netto", "views": 168, "reach": 79, "interactions": 11, "likes": 11, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/Ddlz9OvouBa/", "watch": 7, "skip": 70.6}, {"id": "18577207054068999", "time": "2026-09-23 14:55", "format": "Carrousel", "title": "Recette n°3 : poulet yakitori", "views": 164, "reach": 52, "interactions": 9, "likes": 9, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdoXBwaDnlw/", "watch": null, "skip": null}, {"id": "18017230985728096", "time": "2026-09-10 11:30", "format": "Photo", "title": "Photo sans légende (10 sept.)", "views": 137, "reach": 67, "interactions": 11, "likes": 11, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdGhNzuuUK_/", "watch": null, "skip": null}, {"id": "17883303897619981", "time": "2026-09-08 10:32", "format": "Photo", "title": "Foire aux vins", "views": 120, "reach": 54, "interactions": 13, "likes": 13, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdBQ6Oqjmac/", "watch": null, "skip": null}, {"id": "18242840755315707", "time": "2026-09-29 20:08", "format": "Reel", "title": "Sodas ou bières ?", "views": 101, "reach": 67, "interactions": 8, "likes": 7, "comments": 0, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/Dd4XWNxO83A/", "watch": 5, "skip": 66.7}, {"id": "17914486230467433", "time": "2026-10-07 14:50", "format": "Reel", "title": "Recette n°5 : pâtes crémeuses au pesto", "views": 99, "reach": 64, "interactions": 4, "likes": 4, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DeMZfkUO6fE/", "watch": 4, "skip": 81.5}], "audience": null, "summary": ["Les vues ont plus que doublé, mais sur une petite base : le compte a démarré le 8 septembre.", "Les plus gros pics (1er, 8 et 9 octobre) tombent des jours sans publication dans le fil : ce sont très probablement des stories.", "Le Reel Octobre Rose avec l'équipe est la meilleure publication, avec le visionnage le plus long.", "Les Reels recettes perdent la plupart des gens dans les premières secondes."], "recos": [["Publier au moins 2 fois par semaine", "Pendant la pause de mi-octobre, l'audience est retombée presque à zéro. Un rythme fixe (recette le mardi, produit ou promo le vendredi) vaut mieux que des rafales."], ["Reels pour se faire découvrir, carrousels pour fidéliser", "Les Reels touchent bien plus de comptes ; les carrousels recettes font davantage réagir les abonnés. Garde les deux."], ["Soigner les 2 premières secondes des Reels recettes", "Montre le plat fini dès la première image avec le prix total en gros (« un plat pour 4 à moins de 5 € »), puis la décomposition."], ["Mettre l'équipe en avant", "Le Reel Octobre Rose est le meilleur sur toute la ligne. Des visages connus du quartier accrochent plus qu'une image générée."], ["Faire des stories régulièrement", "Les pics du mois pointent vers les stories. Publie-en plusieurs par semaine (arrivages, promos du jour, coulisses) et range les meilleures en « À la une »."], ["Demander explicitement l'action", "Sauvegardes, partages et commentaires sont presque à zéro. Termine chaque recette par « Enregistre-la » ou « Tague la personne avec qui tu la ferais »."], ["Viser les 100 abonnés", "En dessous, Instagram ne donne ni les gains d'abonnés par jour, ni l'âge et la ville de l'audience, ni ses heures de connexion. Un QR code en caisse ou un petit jeu-concours suffit souvent."]]}, {"id": "cessole", "name": "Intermarché Cessole", "handle": "intermarche.cessole", "place": "143 boulevard de Cessole, Nice", "brand": "intermarche", "followers": 237, "mediaCount": 28, "compare": {"views": 12645, "viewsPrev": 2379, "engaged": 445, "engagedPrev": 92}, "daily": [{"date": "2026-09-25", "followers": 5, "reach": 320, "views": 671, "engaged": 20}, {"date": "2026-09-26", "followers": 19, "reach": 431, "views": 1783, "engaged": 71}, {"date": "2026-09-27", "followers": 6, "reach": 77, "views": 299, "engaged": 11}, {"date": "2026-09-28", "followers": 1, "reach": 95, "views": 277, "engaged": 12}, {"date": "2026-09-29", "followers": 2, "reach": 197, "views": 542, "engaged": 21}, {"date": "2026-09-30", "followers": 3, "reach": 80, "views": 338, "engaged": 18}, {"date": "2026-10-01", "followers": 3, "reach": 265, "views": 918, "engaged": 30}, {"date": "2026-10-02", "followers": 3, "reach": 344, "views": 707, "engaged": 26}, {"date": "2026-10-03", "followers": 1, "reach": 55, "views": 296, "engaged": 5}, {"date": "2026-10-04", "followers": 1, "reach": 36, "views": 154, "engaged": 4}, {"date": "2026-10-05", "followers": 0, "reach": 269, "views": 600, "engaged": 23}, {"date": "2026-10-06", "followers": 5, "reach": 527, "views": 971, "engaged": 39}, {"date": "2026-10-07", "followers": 5, "reach": 343, "views": 996, "engaged": 29}, {"date": "2026-10-08", "followers": 2, "reach": 372, "views": 812, "engaged": 30}, {"date": "2026-10-09", "followers": 0, "reach": 223, "views": 614, "engaged": 30}, {"date": "2026-10-10", "followers": 2, "reach": 48, "views": 204, "engaged": 5}, {"date": "2026-10-11", "followers": 0, "reach": 44, "views": 154, "engaged": 6}, {"date": "2026-10-12", "followers": 1, "reach": 201, "views": 389, "engaged": 21}, {"date": "2026-10-13", "followers": 0, "reach": 110, "views": 245, "engaged": 8}, {"date": "2026-10-14", "followers": 0, "reach": 38, "views": 213, "engaged": 1}, {"date": "2026-10-15", "followers": 2, "reach": 80, "views": 275, "engaged": 5}, {"date": "2026-10-16", "followers": 0, "reach": 25, "views": 94, "engaged": 2}, {"date": "2026-10-17", "followers": 0, "reach": 11, "views": 21, "engaged": 1}, {"date": "2026-10-18", "followers": 0, "reach": 14, "views": 28, "engaged": 0}, {"date": "2026-10-19", "followers": 1, "reach": 18, "views": 55, "engaged": 2}, {"date": "2026-10-20", "followers": 2, "reach": 15, "views": 48, "engaged": 0}, {"date": "2026-10-21", "followers": 0, "reach": 113, "views": 241, "engaged": 7}, {"date": "2026-10-22", "followers": 2, "reach": 22, "views": 90, "engaged": 2}, {"date": "2026-10-23", "followers": 0, "reach": 15, "views": 120, "engaged": 1}, {"date": "2026-10-24", "followers": 0, "reach": 204, "views": 490, "engaged": 15}], "posts": [{"id": "18092759651416284", "time": "2026-09-26 09:42", "format": "Reel", "title": "La Tribu Intermarché", "views": 1275, "reach": 481, "interactions": 137, "likes": 75, "comments": 14, "saves": 4, "shares": 39, "link": "https://www.instagram.com/reel/DdvhZjXsi6m/", "watch": 30, "skip": 58.5}, {"id": "17872887045638542", "time": "2026-10-05 19:50", "format": "Reel", "title": "Panier apéro à moins de 10 €", "views": 1095, "reach": 664, "interactions": 58, "likes": 43, "comments": 1, "saves": 0, "shares": 13, "link": "https://www.instagram.com/reel/DeHx4vrsAfb/", "watch": 16, "skip": 59.7}, {"id": "18150605239556844", "time": "2026-10-06 18:31", "format": "Reel", "title": "Dégustation : croustillant du traiteur asiatique", "views": 983, "reach": 615, "interactions": 62, "likes": 42, "comments": 1, "saves": 0, "shares": 18, "link": "https://www.instagram.com/reel/DeKNrRVMTuJ/", "watch": 16, "skip": 56.6}, {"id": "17957039604080610", "time": "2026-10-01 14:51", "format": "Reel", "title": "Réunion annuelle, objectif 2027", "views": 915, "reach": 438, "interactions": 46, "likes": 40, "comments": 0, "saves": 0, "shares": 4, "link": "https://www.instagram.com/reel/Dd880XSMH5v/", "watch": 19, "skip": 50.8}, {"id": "18109009073269662", "time": "2026-10-08 16:42", "format": "Reel", "title": "À la rencontre de nos collaborateurs", "views": 882, "reach": 498, "interactions": 44, "likes": 37, "comments": 2, "saves": 0, "shares": 4, "link": "https://www.instagram.com/reel/DePK_6jML19/", "watch": 21, "skip": 62.3}, {"id": "18113204197834823", "time": "2026-09-25 12:13", "format": "Reel", "title": "POV : tu venais juste chercher des pâtes", "views": 739, "reach": 454, "interactions": 27, "likes": 21, "comments": 0, "saves": 2, "shares": 4, "link": "https://www.instagram.com/reel/DdtN7xXsdTH/", "watch": 9, "skip": 44.4}, {"id": "18142032055592302", "time": "2026-10-09 09:29", "format": "Carrousel", "title": "Jogging Rose avec les équipes", "views": 644, "reach": 209, "interactions": 35, "likes": 33, "comments": 2, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DeQ-Y0ojUlj/", "watch": null, "skip": null}, {"id": "18118045889019771", "time": "2026-09-29 02:25", "format": "Reel", "title": "Panier veggie et bio à moins de 10 €", "views": 601, "reach": 334, "interactions": 35, "likes": 29, "comments": 0, "saves": 0, "shares": 4, "link": "https://www.instagram.com/reel/Dd1o5vvs_jI/", "watch": 15, "skip": 63.7}, {"id": "18039170216835343", "time": "2026-09-21 11:00", "format": "Reel", "title": "Panier à 9,98 € pour 6 repas", "views": 500, "reach": 296, "interactions": 22, "likes": 21, "comments": 0, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/DdiyVNZM3U4/", "watch": 12, "skip": 68.9}, {"id": "18123698134906949", "time": "2026-10-12 20:10", "format": "Reel", "title": "Brunch gourmand à moins de 10 €", "views": 484, "reach": 303, "interactions": 31, "likes": 29, "comments": 0, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/DeZ2A6Esg6E/", "watch": 16, "skip": 58.5}, {"id": "18267985204305668", "time": "2026-10-02 19:48", "format": "Reel", "title": "Le hasard fait les courses (la roue)", "views": 469, "reach": 296, "interactions": 24, "likes": 18, "comments": 0, "saves": 0, "shares": 5, "link": "https://www.instagram.com/reel/DeACiPPsjCa/", "watch": 13, "skip": 64.8}, {"id": "17933577702401217", "time": "2026-09-24 14:22", "format": "Reel", "title": "3 articles, 1 seul rayon", "views": 429, "reach": 224, "interactions": 26, "likes": 23, "comments": 2, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/Ddq35KGMqng/", "watch": 15, "skip": 70.5}, {"id": "18018634421733056", "time": "2026-09-26 11:47", "format": "Reel", "title": "Raclette, tartiflette ou Mont d'Or ?", "views": 419, "reach": 184, "interactions": 24, "likes": 22, "comments": 0, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/DdvvyFQM2-L/", "watch": 6, "skip": 60.8}, {"id": "17902409727578779", "time": "2026-09-09 15:00", "format": "Reel", "title": "Soirée d'avant-première Foire aux vins", "views": 404, "reach": 177, "interactions": 20, "likes": 20, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DdEUUjnsegv/", "watch": 10, "skip": 65.7}, {"id": "18179878018426951", "time": "2026-09-23 14:59", "format": "Carrousel", "title": "Recette : fajitas au bœuf", "views": 354, "reach": 106, "interactions": 22, "likes": 22, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdoXb1fDCGn/", "watch": null, "skip": null}, {"id": "17938720215391703", "time": "2026-10-24 21:40", "format": "Reel", "title": "Nouvelles baguettes goûtées par les clients", "views": 348, "reach": 217, "interactions": 23, "likes": 21, "comments": 0, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/De45Pa8xAYg/", "watch": 18, "skip": 61.4}, {"id": "17896326705405892", "time": "2026-09-30 11:50", "format": "Carrousel", "title": "Recette : pâtes Boursin, lardons, gruyère", "views": 329, "reach": 104, "interactions": 15, "likes": 14, "comments": 1, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/Dd6DW4CjO-N/", "watch": null, "skip": null}, {"id": "18122484142921035", "time": "2026-09-29 20:15", "format": "Reel", "title": "Les Celsius arrivent", "views": 308, "reach": 152, "interactions": 15, "likes": 13, "comments": 1, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/Dd4YGy6MMGw/", "watch": 5, "skip": 72.5}, {"id": "18072811895481822", "time": "2026-09-22 15:08", "format": "Reel", "title": "Les shots Yumi", "views": 303, "reach": 139, "interactions": 17, "likes": 17, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DdlzmBtsaz0/", "watch": 5, "skip": 71.1}, {"id": "18137176807619360", "time": "2026-09-09 11:39", "format": "Photo", "title": "Koh-Lanta débarque au magasin", "views": 262, "reach": 98, "interactions": 11, "likes": 11, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdD89pYMmjv/", "watch": null, "skip": null}, {"id": "18134274196708723", "time": "2026-10-07 14:46", "format": "Reel", "title": "Recette : raviolis gratinés", "views": 252, "reach": 124, "interactions": 10, "likes": 10, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DeMZCPcsjcL/", "watch": 5, "skip": 69.6}, {"id": "18030158414675012", "time": "2026-09-08 15:04", "format": "Reel", "title": "Offre Foire aux vins", "views": 209, "reach": 103, "interactions": 13, "likes": 12, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DdBvtw7s-gL/", "watch": 4, "skip": 81.0}, {"id": "18079502660397067", "time": "2026-10-21 14:17", "format": "Reel", "title": "Recette : tortellini gratinés", "views": 168, "reach": 86, "interactions": 5, "likes": 5, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DewY4PEsOt6/", "watch": 4, "skip": 67.0}], "audience": {"hours": [24.0714, 14.3929, 9.9286, 7.0357, 8, 12.5714, 21.2143, 34.9643, 42.5714, 47.5, 48.2857, 51, 56.1071, 58, 53.5357, 54.9643, 55.0714, 57.75, 59.6786, 61.0714, 61.3571, 63.8929, 53.1071, 38.1429], "ages": [["13-17", 2], ["18-24", 35], ["25-34", 69], ["35-44", 52], ["45-54", 41], ["55-64", 26], ["65+", 10]], "cities": [["Nice", 106], ["Paris", 5], ["Abidjan", 4], ["Marseille", 3], ["Antony", 2], ["Cagnes-sur-Mer", 2], ["Châtenay-Malabry", 2], ["Clamart", 2]]}, "summary": ["Forte progression, portée par le rythme : 16 publications en 30 jours, contre 7 le mois d'avant.", "Meilleure journée en abonnés : le 26 septembre, jour du Reel « La Tribu Intermarché », ton meilleur contenu sur toute la ligne.", "Les vidéos d'équipe et la série « Panier à moins de 10 € » marchent le mieux ; les Reels recettes et les simples présentations de produits, le moins.", "La pause du 13 au 20 octobre a fait chuter les vues et quasiment arrêté les gains d'abonnés."], "recos": [["Faire de l'équipe le cœur du compte", "« La Tribu Intermarché » est le plus vu, le plus partagé, le plus commenté et le plus regardé. Lance un rendez-vous fixe chaque semaine : un portrait, un métier, une coulisse."], ["Faire du « Panier à moins de 10 € » une vraie série", "Chaque épisode marche, et le panier apéro a la plus grande portée du compte. Même titre, même mise en scène, jour fixe."], ["Repenser les Reels recettes", "Tortellini et raviolis sont en bas du classement. Les recettes marchent mieux en carrousel, ou tournées en dégustation avec quelqu'un de l'équipe."], ["Montrer des gens plutôt que des produits", "Les nouveautés présentées seules (Celsius, Yumi) sont peu vues ; les baguettes goûtées par des clients font nettement mieux."], ["Ne pas couper le rythme", "Vise 3 à 4 publications par semaine, programmées à l'avance, pour éviter un nouveau creux comme mi-octobre."], ["Publier en soirée", "Tes abonnés sont le plus connectés entre 19 h et 22 h, avec un second pic au déjeuner. Programme les Reels vers 18 h 30 - 19 h."], ["Encourager les partages", "Les vidéos d'équipe sont très partagées. Demande à l'équipe de repartager en story à chaque fois : c'est ta meilleure source d'abonnés locaux."]]}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById('data').textContent);
+  const $ = (s) => document.querySelector(s);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const NS = 'http://www.w3.org/2000/svg';
+  const svgEl = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+
+  const nf = new Intl.NumberFormat('fr-FR');
+  const int = (v) => (v == null ? '—' : nf.format(Math.round(v)));
+  const pct = (v) => (v == null ? '—' : (v * 100).toLocaleString('fr-FR', { maximumFractionDigits: 1 }) + ' %');
+  const change = (a, b) => (b ? (a - b) / b : null);
+  const signed = (v) => (v == null ? '—' : (v >= 0 ? '+' : '−') + nf.format(Math.round(Math.abs(v) * 100)) + ' %');
+  const D = (s) => new Date(String(s).slice(0, 10) + 'T12:00:00Z');
+  const dShort = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+  const dLong = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+  const dFull = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  const day = (s) => dShort.format(D(s));
+  const longday = (s) => { const t = dLong.format(D(s)); return t.charAt(0).toUpperCase() + t.slice(1); };
+  const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  // ---------- derived numbers ----------
+  function derive(store) {
+    const start = DATA.period.start;
+    const prevStart = new Date(D(start).getTime() - 30 * 864e5).toISOString().slice(0, 10);
+    const posts = store.posts.map((p) => ({ ...p, date: p.time.slice(0, 10), rate: p.reach ? p.interactions / p.reach : null, recent: p.time.slice(0, 10) >= start }));
+    const days = store.daily.map((d) => {
+      const ps = posts.filter((p) => p.date === d.date);
+      return { ...d, posts: ps };
+    });
+    const hasFollowers = days.some((d) => d.followers != null);
+    const newFollowers = hasFollowers ? days.reduce((s, d) => s + (d.followers || 0), 0) : null;
+    const nowCount = posts.filter((p) => p.date >= start).length;
+    const prevCount = posts.filter((p) => p.date >= prevStart && p.date < start).length;
+    // longest run of days with no feed post
+    let best = null, cur = null;
+    days.forEach((d, i) => {
+      if (!d.posts.length) { cur = cur ? { from: cur.from, to: i } : { from: i, to: i }; if (!best || cur.to - cur.from > best.to - best.from) best = { ...cur }; }
+      else cur = null;
+    });
+    const avg = (xs) => (xs.length ? xs.reduce((s, d) => s + d.views, 0) / xs.length : null);
+    const gap = best && {
+      from: days[best.from].date, to: days[best.to].date, len: best.to - best.from + 1,
+      inGap: avg(days.slice(best.from, best.to + 1)),
+      other: avg(days.filter((_, i) => i < best.from || i > best.to)),
+      inGapFol: hasFollowers ? days.slice(best.from, best.to + 1).reduce((s, d) => s + d.followers, 0) : null,
+    };
+    const formats = ['Reel', 'Carrousel', 'Photo'].map((f) => {
+      const ps = posts.filter((p) => p.format === f);
+      if (!ps.length) return null;
+      const sum = (k) => ps.reduce((s, p) => s + (p[k] || 0), 0);
+      return { format: f, n: ps.length, reach: sum('reach') / ps.length, views: sum('views') / ps.length, rate: sum('reach') ? sum('interactions') / sum('reach') : null };
+    }).filter(Boolean);
+    const deep = ['likes', 'comments', 'saves', 'shares'].reduce((o, k) => ({ ...o, [k]: posts.reduce((s, p) => s + p[k], 0) }), {});
+    return { posts, days, hasFollowers, newFollowers, nowCount, prevCount, gap, formats, deep };
+  }
+
+  // ---------- bar chart ----------
+  function barChart(box, rows, opts) {
+    const tip = box.querySelector('.tip');
+    box.querySelectorAll('svg').forEach((n) => n.remove());
+    tip.hidden = true;
+    const W = Math.max(300, box.clientWidth || 700), H = opts.height;
+    const m = { t: 10, r: 4, b: opts.dots ? 46 : 28, l: 8 };
+    const max = Math.max(1, ...rows.map((r) => r.value));
+    const stepTick = niceStep(max / 4);
+    const top = Math.ceil(max / stepTick) * stepTick;
+    const ticks = []; for (let v = 0; v <= top + 1e-9; v += stepTick) ticks.push(v);
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: 'img', 'aria-label': opts.label });
+    box.prepend(svg);
+    // y labels, measured for the left margin
+    const gL = svgEl('g', {}); svg.append(gL);
+    let wmax = 0;
+    const tickTexts = ticks.map((v) => { const t = svgEl('text', { class: 'tick', 'text-anchor': 'end' }); t.textContent = int(v); gL.append(t); wmax = Math.max(wmax, t.getComputedTextLength()); return [t, v]; });
+    m.l = Math.ceil(wmax) + 10;
+    const y = (v) => m.t + (H - m.t - m.b) * (1 - v / top);
+    tickTexts.forEach(([t, v]) => { t.setAttribute('x', m.l - 6); t.setAttribute('y', y(v) + 4); });
+    const gG = svgEl('g', {}); svg.prepend(gG);
+    ticks.forEach((v) => gG.append(svgEl('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: cssVar('--grid'), 'stroke-width': 1 })));
+    const n = rows.length, band = (W - m.l - m.r) / n, bw = Math.max(2, band * 0.72);
+    const xOf = (i) => m.l + band * i + (band - bw) / 2;
+    const accent = cssVar('--accent'), muted = cssVar('--bar-muted'), ink = cssVar('--ink');
+    const bars = rows.map((r, i) => {
+      const h = Math.max(0, y(0) - y(r.value));
+      const b = svgEl('rect', { x: xOf(i), y: y(r.value), width: bw, height: h, rx: Math.min(3, bw / 2), fill: opts.highlight && !r.hl ? muted : accent });
+      svg.append(b); return b;
+    });
+    svg.append(svgEl('line', { x1: m.l, x2: W - m.r, y1: y(0), y2: y(0), stroke: cssVar('--muted'), 'stroke-width': 1, opacity: 0.5 }));
+    if (opts.dots) rows.forEach((r, i) => { if (r.dot) svg.append(svgEl('circle', { cx: xOf(i) + bw / 2, cy: H - m.b + 10, r: Math.min(4, Math.max(2.5, bw / 3)), fill: ink })); });
+    const every = Math.max(1, Math.ceil(n / Math.max(2, Math.floor((W - m.l) / opts.labelWidth))));
+    rows.forEach((r, i) => {
+      if (i % every) return;
+      const t = svgEl('text', { class: 'tick', 'text-anchor': 'middle', x: xOf(i) + bw / 2, y: H - m.b + (opts.dots ? 32 : 18) });
+      t.textContent = r.label; svg.append(t);
+    });
+    // hover / tap targets
+    rows.forEach((r, i) => {
+      const hit = svgEl('rect', { x: m.l + band * i, y: m.t, width: band, height: H - m.t - m.b + 18, fill: 'transparent' });
+      const show = () => {
+        bars.forEach((b, j) => b.setAttribute('opacity', j === i ? 1 : 0.4));
+        tip.replaceChildren(...opts.tip(r).map((line, k) => el('div', k === 0 ? 'k' : '', line)));
+        tip.hidden = false;
+        const scale = box.clientWidth / W;
+        const cx = (xOf(i) + bw / 2) * scale;
+        tip.style.left = Math.max(0, Math.min(box.clientWidth - tip.offsetWidth, cx - tip.offsetWidth / 2)) + 'px';
+      };
+      const hide = () => { bars.forEach((b) => b.setAttribute('opacity', 1)); tip.hidden = true; };
+      hit.addEventListener('mouseenter', show); hit.addEventListener('mouseleave', hide);
+      hit.addEventListener('click', show);
+      svg.append(hit);
+    });
+  }
+  function niceStep(raw) {
+    const p = Math.pow(10, Math.floor(Math.log10(Math.max(raw, 1))));
+    const f = raw / p;
+    return Math.max(1, (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p);
+  }
+  function hbars(box, rows, hlTop) {
+    const max = Math.max(1, ...rows.map((r) => r.value));
+    const order = rows.slice().sort((a, b) => b.value - a.value);
+    const hl = new Set(order.slice(0, hlTop).map((r) => r.label));
+    box.replaceChildren(...rows.map((r) => {
+      const row = el('div', 'hrow');
+      const lbl = el('div', 'lbl');
+      const name = el('span'); name.append(el('b', '', r.label)); if (r.extra) name.append(' ', r.extra);
+      lbl.append(name, el('span', '', r.valueText));
+      const track = el('div', 'track'); const fill = el('div', 'fill' + (hl.has(r.label) ? ' hl' : ''));
+      fill.style.width = (r.value / max * 100) + '%'; track.append(fill);
+      row.append(lbl, track); return row;
+    }));
+  }
+  const li = (left, sub, right) => {
+    const l = el('li'); const a = el('div'); a.append(el('div', 'd', left)); if (sub) a.append(el('div', 'm', sub));
+    const r = el('div', 'n'); right(r); l.append(a, r); return l;
+  };
+  const postsLine = (d) => (d.posts.length ? 'Publié : ' + d.posts.map((p) => p.title).join(' · ') : 'Aucune publication dans le fil');
+
+  // ---------- render ----------
+  let current = null, sortKey = 'views', sortDir = -1;
+
+  function render(id) {
+    const store = DATA.stores.find((s) => s.id === id) || DATA.stores[0];
+    current = store;
+    const x = derive(store);
+    current.x = x;
+    document.documentElement.dataset.brand = store.brand;
+    document.querySelectorAll('#switch button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === store.id)));
+    document.title = 'Insta Magasins · ' + store.name;
+
+    $('#store-name').textContent = store.name;
+    $('#store-handle').textContent = '@' + store.handle;
+    $('#store-place').textContent = store.place;
+    $('#period').textContent = 'Du ' + dFull.format(D(DATA.period.start)) + ' au ' + dFull.format(D(DATA.period.end));
+    $('#ticket-date').textContent = 'Données au ' + dShort.format(D(DATA.updated));
+
+    // KPIs
+    const c = store.compare;
+    const kpi = (label, value, subNode) => { const k = el('div', 'kpi'); k.append(el('div', 'l', label), el('div', 'v', value)); const s = el('div', 's'); subNode(s); k.append(s); return k; };
+    const delta = (s, a, b) => { const v = change(a, b); const sp = el('span', v > 0 ? 'up' : v < 0 ? 'down' : '', signed(v)); s.append(sp, ' vs 30 j d\'avant (' + int(b) + ')'); };
+    $('#kpis').replaceChildren(
+      kpi('Abonnés', int(store.followers), (s) => s.append(int(store.mediaCount) + ' publications au total')),
+      kpi('Nouveaux abonnés', x.newFollowers == null ? '—' : '+' + int(x.newFollowers), (s) => s.append(x.newFollowers == null ? 'disponible dès 100 abonnés' : 'gagnés sur la période')),
+      kpi('Vues de contenu', int(c.views), (s) => delta(s, c.views, c.viewsPrev)),
+      kpi('Comptes engagés', int(c.engaged), (s) => delta(s, c.engaged, c.engagedPrev)),
+      kpi('Publications', int(x.nowCount), (s) => s.append(int(x.prevCount) + ' les 30 jours d\'avant')),
+    );
+    $('#summary').replaceChildren(...store.summary.map((t) => el('li', '', t)));
+
+    // peaks
+    $('#peaks').replaceChildren(...x.days.slice().sort((a, b) => b.views - a.views).slice(0, 4).map((d) =>
+      li(longday(d.date), d.posts.length ? 'Publié : ' + d.posts.map((p) => p.title).join(' · ') : 'Pas de publication dans le fil : probablement une story',
+        (r) => { r.append(el('b', '', int(d.views)), ' vues'); })));
+
+    // follower peaks
+    $('#card-fpeaks').hidden = !x.hasFollowers;
+    if (x.hasFollowers) {
+      $('#fpeaks').replaceChildren(...x.days.filter((d) => d.followers > 0).sort((a, b) => b.followers - a.followers || b.views - a.views).slice(0, 3).map((d) =>
+        li(longday(d.date), d.posts.length ? 'Publié : ' + d.posts.map((p) => p.title).join(' · ') : 'Pas de publication dans le fil ce jour-là',
+          (r) => { r.append(el('b', '', '+' + int(d.followers)), ' abonnés'); })));
+    }
+
+    // gap
+    const g = x.gap;
+    $('#gap').replaceChildren(...(g ? [
+      li('Du ' + day(g.from) + ' au ' + day(g.to), 'Jours d\'affilée sans publication dans le fil', (r) => r.append(el('b', '', int(g.len)), ' jours')),
+      li('Vues par jour pendant la pause', 'En moyenne', (r) => r.append(el('b', '', int(g.inGap)))),
+      li('Vues par jour le reste du mois', 'En moyenne', (r) => r.append(el('b', '', int(g.other)))),
+      ...(g.inGapFol != null ? [li('Abonnés gagnés pendant la pause', 'Au total', (r) => r.append(el('b', '', '+' + int(g.inGapFol))))] : []),
+    ] : [li('Aucune pause', 'Le compte a publié chaque jour', () => {})]));
+
+    // top 3
+    const top = x.posts.slice().sort((a, b) => b.views - a.views).slice(0, 3);
+    $('#tops').replaceChildren(...top.map((p, i) => {
+      const card = el('article', 'top');
+      const head = el('div'); head.style.display = 'flex'; head.style.justifyContent = 'space-between'; head.style.gap = '8px';
+      head.append(el('span', 'rank', 'N°' + (i + 1)), el('span', 'pill', p.format + ' · ' + day(p.date)));
+      const t = el('div', 't'); const a = el('a', '', p.title); a.href = p.link; a.target = '_blank'; a.rel = 'noopener'; t.append(a);
+      const st = el('div', 'stats');
+      const stat = (v, l) => { const s = el('span'); s.append(el('b', '', v), ' ' + l); st.append(s); };
+      stat(int(p.views), 'vues'); stat(int(p.reach), 'touchés'); stat(int(p.interactions), 'interactions');
+      if (p.shares) stat(int(p.shares), 'partages');
+      if (p.watch != null) stat(p.watch + ' s', 'visionnage');
+      card.append(head, t, st); return card;
+    }));
+
+    // formats
+    hbars($('#formats'), x.formats.map((f) => ({ label: f.format + 's', extra: '(' + f.n + ')', value: f.reach, valueText: int(f.reach) + ' touchés · taux ' + pct(f.rate) })), 1);
+
+    // deep
+    const dp = x.deep;
+    $('#deep').replaceChildren(
+      li('Likes', null, (r) => r.append(el('b', '', int(dp.likes)))),
+      li('Commentaires', null, (r) => r.append(el('b', '', int(dp.comments)))),
+      li('Sauvegardes', null, (r) => r.append(el('b', '', int(dp.saves)))),
+      li('Partages', null, (r) => r.append(el('b', '', int(dp.shares)))),
+    );
+
+    drawTable();
+
+    // audience
+    const au = store.audience;
+    $('#aud-empty').hidden = !!au;
+    $('#aud-grid').hidden = !au;
+    if (au) {
+      const total = au.ages.reduce((s, a) => s + a[1], 0);
+      hbars($('#ages'), au.ages.map(([l, v]) => ({ label: l + ' ans', value: v, valueText: int(v) + ' · ' + pct(v / total) })), 2);
+      hbars($('#cities'), au.cities.map(([l, v]) => ({ label: l, value: v, valueText: int(v) })), 1);
+    }
+
+    // recos
+    $('#recos').replaceChildren(...store.recos.map(([t, d]) => { const l = el('li'); l.append(el('b', '', t), el('p', '', d)); return l; }));
+    $('#source').textContent = 'Source : ' + DATA.source + ' · données au ' + dFull.format(D(DATA.updated));
+    drawCharts();
+  }
+
+  function drawCharts() {
+    if (!current) return;
+    const x = current.x;
+    barChart($('#chart-views'), x.days.map((d) => ({ value: d.views, label: day(d.date), dot: d.posts.length > 0, d })),
+      { height: 260, dots: true, labelWidth: 62, label: 'Vues par jour', tip: ({ d }) => [longday(d.date), int(d.views) + ' vues de contenu', int(d.engaged) + ' comptes engagés', ...(d.followers != null ? ['+' + int(d.followers) + ' abonnés'] : []), postsLine(d)] });
+    $('#followers-empty').hidden = x.hasFollowers;
+    $('#chart-followers').hidden = !x.hasFollowers;
+    if (x.hasFollowers) barChart($('#chart-followers'), x.days.map((d) => ({ value: d.followers, label: day(d.date), dot: d.posts.length > 0, d })),
+      { height: 200, dots: true, labelWidth: 62, label: 'Nouveaux abonnés par jour', tip: ({ d }) => [longday(d.date), '+' + int(d.followers) + ' abonnés', int(d.views) + ' vues de contenu', postsLine(d)] });
+    const au = current.audience;
+    if (au) {
+      const top3 = new Set(au.hours.map((v, h) => [v, h]).sort((a, b) => b[0] - a[0]).slice(0, 3).map((a) => a[1]));
+      barChart($('#chart-hours'), au.hours.map((v, h) => ({ value: v, label: h + ' h', hl: top3.has(h), h })),
+        { height: 200, highlight: true, labelWidth: 36, label: 'Abonnés en ligne par heure', tip: ({ h, value }) => [h + ' h – ' + ((h + 1) % 24) + ' h', int(value) + ' abonnés connectés en moyenne'] });
+    }
+  }
+
+  function drawTable() {
+    const q = $('#search').value.trim().toLowerCase();
+    const rows = current.x.posts.filter((p) => !q || (p.title + ' ' + p.format).toLowerCase().includes(q)).sort((a, b) => {
+      const va = a[sortKey], vb = b[sortKey];
+      if (va == null && vb == null) return 0; if (va == null) return 1; if (vb == null) return -1;
+      return (typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb), 'fr')) * sortDir;
+    });
+    document.querySelectorAll('#table th').forEach((th) => th.setAttribute('aria-sort', th.dataset.k === sortKey ? (sortDir > 0 ? 'ascending' : 'descending') : 'none'));
+    $('#count').textContent = rows.length + ' publication' + (rows.length > 1 ? 's' : '');
+    $('#table tbody').replaceChildren(...rows.map((p) => {
+      const tr = el('tr', p.recent ? '' : 'old');
+      const td = (text, cls) => { const c = el('td', cls || '', text); tr.append(c); return c; };
+      const d = td('', ''); if (p.recent) d.append(el('span', 'new')); d.append(day(p.date));
+      const t = td('', 't'); const a = el('a', '', p.title); a.href = p.link; a.target = '_blank'; a.rel = 'noopener'; t.append(a);
+      td(p.format, 'hide-sm');
+      td(int(p.views), 'num'); td(int(p.reach), 'num'); td(pct(p.rate), 'num');
+      td(int(p.shares), 'num hide-sm'); td(p.watch == null ? '—' : p.watch + ' s', 'num hide-sm'); td(p.skip == null ? '—' : pct(p.skip / 100), 'num hide-sm');
+      return tr;
+    }));
+  }
+
+  // ---------- controls ----------
+  $('#switch').replaceChildren(...DATA.stores.map((s) => {
+    const b = el('button', '', s.name); b.type = 'button'; b.dataset.id = s.id;
+    b.addEventListener('click', () => { choose(s.id); });
+    return b;
+  }));
+  document.querySelectorAll('#table th').forEach((th) => th.querySelector('button').addEventListener('click', () => {
+    const k = th.dataset.k;
+    if (k === sortKey) sortDir = -sortDir; else { sortKey = k; sortDir = (k === 'title' || k === 'format') ? 1 : -1; }
+    drawTable();
+  }));
+  $('#search').addEventListener('input', drawTable);
+
+  function choose(id) {
+    try { localStorage.setItem('insta-magasins-store', id); } catch (e) {}
+    try { history.replaceState(null, '', '#' + id); } catch (e) {}
+    render(id);
+  }
+  let rt;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(drawCharts, 120); });
+  if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawCharts);
+  new MutationObserver(drawCharts).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  let start = location.hash.slice(1);
+  if (!DATA.stores.some((s) => s.id === start)) { try { start = localStorage.getItem('insta-magasins-store') || ''; } catch (e) { start = ''; } }
+  if (!DATA.stores.some((s) => s.id === start)) start = DATA.stores[0].id;
+  render(start);
+  window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (DATA.stores.some((s) => s.id === h) && h !== current.id) render(h); });
+})();
+</script>
+</body>
+</html>
