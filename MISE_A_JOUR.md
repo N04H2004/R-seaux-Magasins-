@@ -8,6 +8,11 @@ Le site (statistiques Instagram de deux magasins à Nice) est hébergé sur Verc
 - `index.html` : page statique autonome. Toutes les données sont dans `<script id="data" type="application/json">…</script>` (un seul objet JSON sur une ligne). Ne touche pas au reste de la page (CSS, JS, structure).
 - `data.json` : copie lisible (indentée, 1 espace) du même objet JSON. Les deux doivent rester identiques.
 
+## Étape 0 : une fois par semaine maximum
+La tâche peut être lancée tous les jours, mais le site ne doit être mis à jour qu'une fois par semaine. Avant toute autre action, lis le champ `updated` de `data.json` et compare-le à la date du jour (heure de Paris, `date` suffit, pas besoin de Supermetrics).
+- Si `updated` date de **moins de 6 jours** : ne fais rien d'autre. Ne lance aucun outil Supermetrics, ne modifie aucun fichier, ne commite rien. Termine immédiatement avec une seule ligne : « Pas de mise à jour aujourd'hui (dernière mise à jour le JJ/MM/AAAA). »
+- Sinon : continue avec les étapes ci-dessous.
+
 ## Étapes
 1. Travaille sur la branche `claude/exciting-darwin-jm5s48`. Lis `data.json` pour connaître le schéma exact et le ton des textes actuels.
 2. Fenêtre : les 30 derniers jours complets se terminant hier (heure de Paris), et la période de 30 jours précédente pour la comparaison. Utilise `get_today` de Supermetrics pour les dates.
