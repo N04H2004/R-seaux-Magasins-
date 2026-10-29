@@ -3,7 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Insta Magasins</title>
+<title>Mes Réseaux</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Mes Réseaux">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#16191f">
 <meta name="description" content="Statistiques Instagram des magasins, 30 derniers jours">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -207,7 +215,7 @@ footer { margin-top: 10px; }
 
 <header class="bar">
   <div class="bar-in">
-    <div class="logo"><i></i>Insta Magasins</div>
+    <div class="logo"><i></i>Mes Réseaux</div>
     <nav class="switch" id="switch" aria-label="Choisir le magasin"></nav>
   </div>
 </header>
@@ -498,7 +506,7 @@ footer { margin-top: 10px; }
     current.x = x;
     document.documentElement.dataset.brand = store.brand;
     document.querySelectorAll('#switch button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === store.id)));
-    document.title = 'Insta Magasins · ' + store.name;
+    document.title = 'Mes Réseaux · ' + store.name;
 
     $('#store-name').textContent = store.name;
     $('#store-handle').textContent = '@' + store.handle;

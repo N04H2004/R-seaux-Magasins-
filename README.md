@@ -1,4 +1,4 @@
-# Insta Magasins
+# Mes Réseaux
 
 Tableau de bord des statistiques Instagram des magasins (Netto Temple, Intermarché Cessole), 30 derniers jours.
 

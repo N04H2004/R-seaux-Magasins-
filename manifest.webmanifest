@@ -1,0 +1,16 @@
+{
+  "name": "Mes Réseaux",
+  "short_name": "Mes Réseaux",
+  "description": "Statistiques Instagram des magasins, 30 derniers jours",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#16191f",
+  "theme_color": "#16191f",
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

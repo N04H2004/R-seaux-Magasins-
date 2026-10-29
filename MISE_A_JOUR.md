@@ -1,6 +1,6 @@
-# Mise à jour hebdomadaire d'Insta Magasins
+# Mise à jour hebdomadaire de Mes Réseaux
 
-Instructions suivies par la tâche planifiée « Mise à jour Insta Magasins ».
+Instructions suivies par la tâche planifiée « MAJ Magasins ».
 
 Le site (statistiques Instagram de deux magasins à Nice) est hébergé sur Vercel depuis ce dépôt, branche `claude/exciting-darwin-jm5s48` : chaque push redéploie le site.
 
