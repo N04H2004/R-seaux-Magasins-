@@ -495,6 +495,42 @@
      "Viser les 100 abonnés",
      "Tu en as 94. À 100, Instagram donnera les gains d'abonnés par jour, l'âge et la ville de l'audience et ses heures de connexion. Un QR code en caisse ou un petit jeu-concours suffit souvent."
     ]
+   ],
+   "months": [
+    {
+     "month": "2026-09",
+     "status": "reference",
+     "through": "2026-09-30",
+     "actual": {
+      "posts": 11,
+      "views": 2210,
+      "engaged": 96,
+      "followers": null,
+      "watch": 5.7,
+      "reels": 3
+     },
+     "goals": null
+    },
+    {
+     "month": "2026-10",
+     "status": "in_progress",
+     "through": "2026-10-28",
+     "actual": {
+      "posts": 3,
+      "views": 3819,
+      "engaged": 147,
+      "followers": 94,
+      "watch": 5.7,
+      "reels": 3
+     },
+     "goals": {
+      "posts": 18,
+      "views": 2430,
+      "engaged": 106,
+      "followers": 100,
+      "watch": 8
+     }
+    }
    ]
   },
   {
@@ -1221,6 +1257,42 @@
      "Encourager les partages et les enregistrements",
      "70 des 96 partages viennent de trois Reels. Demande à l'équipe de repartager en story à chaque fois, et ajoute « Enregistre pour ta prochaine liste de courses » aux paniers : il n'y a que 6 enregistrements en tout."
     ]
+   ],
+   "months": [
+    {
+     "month": "2026-09",
+     "status": "reference",
+     "through": "2026-09-30",
+     "actual": {
+      "posts": 13,
+      "views": 6160,
+      "engaged": 244,
+      "followers": 205,
+      "watch": 10.9,
+      "reels": 10
+     },
+     "goals": null
+    },
+    {
+     "month": "2026-10",
+     "status": "in_progress",
+     "through": "2026-10-28",
+     "actual": {
+      "posts": 11,
+      "views": 9907,
+      "engaged": 345,
+      "followers": 236,
+      "watch": 14.4,
+      "reels": 10
+     },
+     "goals": {
+      "posts": 18,
+      "views": 6780,
+      "engaged": 268,
+      "followers": 226,
+      "watch": 13
+     }
+    }
    ]
   }
  ]

@@ -15,8 +15,21 @@ module.exports = async (req, res) => {
     if (ageDays > 3) return res.json({ ok: true, sent: 0, reason: 'pas de mise à jour récente (' + DATA.updated + ')' });
     if ((await redis('GET', 'last_sent')) === DATA.updated) return res.json({ ok: true, sent: 0, reason: 'déjà envoyé' });
 
-    const body = DATA.stores.map((s) => short(s.name) + ' : ' + nf.format(s.compare.views) + ' vues (' + pct(s.compare.views, s.compare.viewsPrev) + ')').join(' · ');
-    const payload = JSON.stringify({ title: 'Les chiffres de la semaine sont là', body, url: '/' });
+    // Monthly grade (same rule as the page): one star per goal reached; watch time needs at least one Reel.
+    const KEYS = ['posts', 'views', 'engaged', 'followers', 'watch'];
+    const grade = (s) => {
+      const m = (s.months || []).filter((x) => x.goals).pop();
+      if (!m) return null;
+      const n = KEYS.filter((k) => m.actual[k] != null && m.actual[k] >= m.goals[k] && (k !== 'watch' || m.actual.reels > 0)).length;
+      return { n, final: m.status === 'final', month: m.month };
+    };
+    const stars = (n) => '★'.repeat(n) + '☆'.repeat(5 - n);
+    const grades = DATA.stores.map((s) => [s, grade(s)]);
+    const final = grades.some(([, g]) => g && g.final);
+    const body = grades.map(([s, g]) => short(s.name) + ' ' + (g ? stars(g.n) : '') + ' · ' + nf.format(s.compare.views) + ' vues (' + pct(s.compare.views, s.compare.viewsPrev) + ')').join('\n');
+    const monthName = grades[0][1] ? new Intl.DateTimeFormat('fr-FR', { month: 'long', timeZone: 'UTC' }).format(new Date(grades[0][1].month + '-15T12:00:00Z')) : '';
+    const title = final ? 'Note finale ' + (/^[ao]/.test(monthName) ? 'd\'' : 'de ') + monthName : 'Les chiffres de la semaine sont là';
+    const payload = JSON.stringify({ title, body, url: '/' });
 
     // HGETALL over REST returns a flat [field, value, field, value, …] list
     const subs = ((await redis('HGETALL', 'subs')) || []).filter((_, i) => i % 2 === 1);
