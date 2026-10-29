@@ -27,7 +27,7 @@ Le site (statistiques Instagram de deux magasins à Nice) est hébergé sur Verc
 ## Note du mois (`months`)
 Chaque magasin a un tableau `months`, du plus ancien au plus récent. Chaque entrée :
 `{"month": "AAAA-MM", "status": "reference" | "in_progress" | "final", "through": "AAAA-MM-JJ", "actual": {...}, "goals": {...} | null}`.
-`actual` et `goals` ont les clés `posts`, `views`, `engaged`, `followers`, `watch` ; `actual` a en plus `reels`. La page calcule les étoiles elle-même : une étoile par clé où `actual >= goals` (pour `watch`, il faut aussi `reels > 0`).
+`actual` a les clés `posts`, `views`, `engaged`, `topReel`, `followers`, `watch`, `reels`. `goals` a 5 clés : `posts`, `views`, `topReel`, `followers`, `watch` pour un magasin qui a un `plan` (depuis novembre 2026 « Le Reel qui perce » remplace « Réactions ») ; `posts`, `views`, `engaged`, `followers`, `watch` pour un magasin sans `plan`. La page calcule les étoiles elle-même : une étoile par clé présente dans `goals` où `actual >= goals` (pour `watch`, il faut aussi `reels > 0`). Remplis toujours toutes les clés de `actual`, même celles qui n'ont pas d'objectif.
 
 Ne modifie jamais une entrée `reference` ou `final`. Chaque lundi :
 1. **Si le mois de l'entrée `in_progress` est terminé** (on est déjà dans le mois suivant) : recalcule son `actual` sur le mois complet (du 1er au dernier jour), mets `through` au dernier jour du mois et passe `status` à `final`. Puis crée l'entrée du nouveau mois avec ses `goals` (règles ci-dessous) et `status: "in_progress"`.
@@ -36,10 +36,11 @@ Ne modifie jamais une entrée `reference` ou `final`. Chaque lundi :
 Comment calculer `actual` pour un mois (Supermetrics, ds_id `IGI`, fuseau `Europe/Paris`, plage personnalisée du 1er du mois à la fin de la période) :
 - `views` et `engaged` : une seule requête par compte, sans dimension de date, avec les champs `profile_views` et `accounts_engaged`. Ne fais jamais la somme de valeurs journalières de `accounts_engaged`.
 - `posts` : nombre de publications du fil (Reels, photos, carrousels ; pas les stories) publiées dans le mois. Champs `media_id`, `timestamp`, `media_product_type` ; exclue `STORY`.
+- `topReel` : vues (`media_views`) du Reel publié dans le mois qui en a le plus, mesurées au moment de la mise à jour ; `null` s'il n'y a aucun Reel.
 - `reels` et `watch` : nombre de Reels publiés dans le mois, et moyenne de `media_reel_avg_watch_time` (en secondes, une décimale) sur ces Reels ; `watch` vaut `null` s'il n'y a aucun Reel.
 - `followers` : nombre total d'abonnés à la fin de la période. Pour un mois qui vient de se terminer : abonnés actuels moins les nouveaux abonnés depuis le 1er du nouveau mois (`follower_count` journalier) ; si ce détail n'est pas disponible (moins de 100 abonnés), prends le nombre actuel.
 
-**Si le magasin a un `plan`** (cible à long terme, objet `plan` du magasin) et que `plan.months` contient le nouveau mois : les `goals` du nouveau mois sont ceux de `plan.months[mois]`. Exception : si l'`actual` du mois qui vient de se terminer dépasse déjà l'objectif prévu pour le nouveau mois, prends pour `views`, `engaged` et `followers` la plus grande des deux valeurs entre l'objectif prévu et `actual du mois terminé × 1,10` (arrondi comme ci-dessous). Ne modifie jamais `plan` toi-même.
+**Si le magasin a un `plan`** (cible à long terme, objet `plan` du magasin) et que `plan.months` contient le nouveau mois : les `goals` du nouveau mois sont ceux de `plan.months[mois]`. Exception : si l'`actual` du mois qui vient de se terminer dépasse déjà l'objectif prévu pour le nouveau mois, prends pour `views`, `topReel` et `followers` la plus grande des deux valeurs entre l'objectif prévu et `actual du mois terminé × 1,10` (arrondi comme ci-dessous). Ne modifie jamais `plan` toi-même.
 
 **Sinon** (pas de `plan`, ou mois au-delà de la cible), règles des objectifs (`goals`) du nouveau mois, à partir de l'`actual` du mois qui vient de se terminer :
 - `posts` : 4 publications par semaine, soit `round(4 × nombre de jours du mois / 7)`.

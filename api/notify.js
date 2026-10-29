@@ -16,11 +16,12 @@ module.exports = async (req, res) => {
     if ((await redis('GET', 'last_sent')) === DATA.updated) return res.json({ ok: true, sent: 0, reason: 'déjà envoyé' });
 
     // Monthly grade (same rule as the page): one star per goal reached; watch time needs at least one Reel.
-    const KEYS = ['posts', 'views', 'engaged', 'followers', 'watch'];
+    const KEYS = ['posts', 'views', 'engaged', 'topReel', 'followers', 'watch'];
     const grade = (s) => {
       const m = (s.months || []).filter((x) => x.goals).pop();
       if (!m) return null;
-      const n = KEYS.filter((k) => m.actual[k] != null && m.actual[k] >= m.goals[k] && (k !== 'watch' || m.actual.reels > 0)).length;
+      // only the goals the month actually has (since Nov 2026: topReel instead of engaged)
+      const n = KEYS.filter((k) => m.goals[k] != null && m.actual[k] != null && m.actual[k] >= m.goals[k] && (k !== 'watch' || m.actual.reels > 0)).length;
       return { n, final: m.status === 'final', month: m.month };
     };
     const stars = (n) => '★'.repeat(n) + '☆'.repeat(5 - n);
