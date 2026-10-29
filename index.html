@@ -208,6 +208,16 @@ footer { margin-top: 10px; }
 @media (prefers-reduced-motion: no-preference) {
   .acc .chev { transition: transform .2s; }
 }
+.notif { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 6px; }
+.notif .ic { flex: none; width: 38px; height: 38px; border-radius: 10px; background: var(--accent-soft); color: var(--accent-ink); display: grid; place-items: center; }
+.notif .ic svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.notif .tt { flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.notif .tt b { font-size: 16px; font-weight: 600; }
+.notif .tt small { font-size: 13px; color: var(--muted); }
+.notif .btns { display: flex; gap: 8px; }
+.btn { font: 600 14px/1 var(--font-body); border: 0; border-radius: 999px; padding: 11px 18px; background: var(--accent); color: var(--on-accent); cursor: pointer; }
+.btn.ghost { background: var(--bg); color: var(--ink); border: 1px solid var(--line); }
+.btn:disabled { opacity: .6; cursor: default; }
 </style>
 </head>
 <body>
@@ -350,6 +360,12 @@ footer { margin-top: 10px; }
       </div>
     </details>
   </div>
+
+  <section class="notif" id="notif" hidden>
+    <span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+    <div class="tt"><b>Notification du lundi</b><small id="notif-msg">Sois prévenu chaque lundi quand les chiffres sont à jour.</small></div>
+    <div class="btns"><button type="button" class="btn" id="notif-on">Activer</button><button type="button" class="btn ghost" id="notif-test" hidden>Tester</button></div>
+  </section>
 
   <footer>
     <span id="source">—</span>
@@ -677,6 +693,52 @@ footer { margin-top: 10px; }
   if (!DATA.stores.some((s) => s.id === start)) start = DATA.stores[0].id;
   render(start);
   window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (DATA.stores.some((s) => s.id === h) && h !== current.id) render(h); });
+})();
+</script>
+<script>
+// Weekly push notification: register the service worker, subscribe on demand, store the subscription server-side.
+(() => {
+  const box = document.getElementById('notif'), msg = document.getElementById('notif-msg');
+  const on = document.getElementById('notif-on'), test = document.getElementById('notif-test');
+  const KEY = 'BH-GaURNGiBSklxn_JLmzG--vBMv1K0gPucH_-Vd9_59hnj3jsWtb1Xh0N2Ns4_3nCubwK3bzd-hT8H2foGxXvM';
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
+  box.hidden = false;
+  const state = (text, showOn, showTest) => { msg.textContent = text; on.hidden = !showOn; test.hidden = !showTest; on.disabled = test.disabled = false; };
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+    state(isIOS && !standalone ? 'Sur iPhone : ajoute d\'abord l\'appli à l\'écran d\'accueil (Partager → Sur l\'écran d\'accueil), puis ouvre-la depuis son icône.' : 'Ce navigateur ne gère pas les notifications.', false, false);
+    return;
+  }
+  const b64 = (s) => { const p = '='.repeat((4 - s.length % 4) % 4); const r = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(r, (c) => c.charCodeAt(0)); };
+  const api = async (path, sub, method = 'POST') => {
+    const r = await fetch(path, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ subscription: sub }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(r.status === 503 ? 'Les notifications ne sont pas encore configurées sur le serveur.' : (j.error || 'Erreur ' + r.status));
+  };
+  let reg;
+  navigator.serviceWorker.register('/sw.js').then(async (r) => {
+    reg = r; await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (Notification.permission === 'denied') state('Notifications bloquées : autorise-les pour cette appli dans les réglages du téléphone.', false, false);
+    else if (sub) { state('Activées : tu seras prévenu chaque lundi matin.', false, true); api('/api/subscribe', sub).catch(() => {}); }
+    else state('Sois prévenu chaque lundi quand les chiffres sont à jour.', true, false);
+  }).catch(() => { box.hidden = true; });
+  on.addEventListener('click', async () => {
+    on.disabled = true;
+    try {
+      if (await Notification.requestPermission() !== 'granted') { state('Notifications refusées. Tu peux les autoriser dans les réglages du téléphone.', false, false); return; }
+      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(KEY) });
+      await api('/api/subscribe', sub);
+      state('Activées : tu seras prévenu chaque lundi matin.', false, true);
+    } catch (e) { state(e.message || 'Impossible d\'activer les notifications.', true, false); }
+  });
+  test.addEventListener('click', async () => {
+    test.disabled = true;
+    try { await api('/api/test', await reg.pushManager.getSubscription()); msg.textContent = 'Notification de test envoyée.'; }
+    catch (e) { msg.textContent = e.message; }
+    test.disabled = false;
+  });
 })();
 </script>
 </body>
