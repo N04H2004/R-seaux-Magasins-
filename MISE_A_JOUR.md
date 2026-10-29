@@ -39,7 +39,9 @@ Comment calculer `actual` pour un mois (Supermetrics, ds_id `IGI`, fuseau `Europ
 - `reels` et `watch` : nombre de Reels publiés dans le mois, et moyenne de `media_reel_avg_watch_time` (en secondes, une décimale) sur ces Reels ; `watch` vaut `null` s'il n'y a aucun Reel.
 - `followers` : nombre total d'abonnés à la fin de la période. Pour un mois qui vient de se terminer : abonnés actuels moins les nouveaux abonnés depuis le 1er du nouveau mois (`follower_count` journalier) ; si ce détail n'est pas disponible (moins de 100 abonnés), prends le nombre actuel.
 
-Règles des objectifs (`goals`) du nouveau mois, à partir de l'`actual` du mois qui vient de se terminer :
+**Si le magasin a un `plan`** (cible à long terme, objet `plan` du magasin) et que `plan.months` contient le nouveau mois : les `goals` du nouveau mois sont ceux de `plan.months[mois]`. Exception : si l'`actual` du mois qui vient de se terminer dépasse déjà l'objectif prévu pour le nouveau mois, prends pour `views`, `engaged` et `followers` la plus grande des deux valeurs entre l'objectif prévu et `actual du mois terminé × 1,10` (arrondi comme ci-dessous). Ne modifie jamais `plan` toi-même.
+
+**Sinon** (pas de `plan`, ou mois au-delà de la cible), règles des objectifs (`goals`) du nouveau mois, à partir de l'`actual` du mois qui vient de se terminer :
 - `posts` : 4 publications par semaine, soit `round(4 × nombre de jours du mois / 7)`.
 - `views` : 10 % de plus que le mois précédent, arrondi à la dizaine.
 - `engaged` : 10 % de plus que le mois précédent, arrondi à l'unité.
@@ -47,6 +49,8 @@ Règles des objectifs (`goals`) du nouveau mois, à partir de l'`actual` du mois
 - `watch` : `min(20, round(watch du mois précédent) + 2)` en secondes ; si le mois précédent n'avait aucun Reel, reprends l'objectif précédent.
 
 Ne change pas ces règles toi-même. Si l'utilisateur a demandé d'autres objectifs, il les aura écrits ici.
+
+Contexte pour les recommandations : à Intermarché Cessole, un QR code Instagram est déjà affiché en caisse. Ne le recommande pas comme une nouveauté (tu peux proposer de le rendre plus visible ou de l'animer).
 
 ## En cas de problème
 Si le connecteur Supermetrics n'est pas disponible, demande une reconnexion, ou si un compte ne renvoie aucune donnée : ne pousse rien de partiel ou d'inventé. Arrête-toi et explique clairement ce qui bloque et comment le corriger.

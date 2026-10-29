@@ -531,7 +531,8 @@
       "watch": 8
      }
     }
-   ]
+   ],
+   "plan": null
   },
   {
    "id": "cessole",
@@ -1293,7 +1294,69 @@
       "watch": 13
      }
     }
-   ]
+   ],
+   "plan": {
+    "start": {
+     "month": "2026-10",
+     "followers": 240,
+     "views": 11000,
+     "engaged": 380,
+     "watch": 14.4
+    },
+    "target": {
+     "month": "2027-04",
+     "followers": 900,
+     "views": 30000,
+     "engaged": 1000,
+     "postsPerWeek": 4,
+     "watch": 20
+    },
+    "months": {
+     "2026-11": {
+      "posts": 17,
+      "views": 13000,
+      "engaged": 446,
+      "followers": 299,
+      "watch": 16
+     },
+     "2026-12": {
+      "posts": 18,
+      "views": 15370,
+      "engaged": 525,
+      "followers": 373,
+      "watch": 17
+     },
+     "2027-01": {
+      "posts": 18,
+      "views": 18170,
+      "engaged": 616,
+      "followers": 465,
+      "watch": 18
+     },
+     "2027-02": {
+      "posts": 16,
+      "views": 21470,
+      "engaged": 724,
+      "followers": 579,
+      "watch": 19
+     },
+     "2027-03": {
+      "posts": 18,
+      "views": 25380,
+      "engaged": 851,
+      "followers": 722,
+      "watch": 20
+     },
+     "2027-04": {
+      "posts": 17,
+      "views": 30000,
+      "engaged": 1000,
+      "followers": 900,
+      "watch": 20
+     }
+    },
+    "why": "Environ 1 client fidèle sur 5 abonné au compte d'ici avril 2027, avec des vues et des réactions qui suivent, et des Reels regardés 20 s en moyenne."
+   }
   }
  ]
 }
