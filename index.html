@@ -751,9 +751,9 @@ footer { margin-top: 10px; }
     const tName = monthName(p.target.month);
     $('#plan-title').textContent = 'Objectifs ' + tName.toLowerCase();
     $('#plan-sub').textContent = int(p.target.followers) + ' abonnés, ' + int(p.target.views) + ' vues par mois';
-    $('#plan-why').textContent = p.why + (cur ? ' Les chiffres « aujourd\'hui » sont ceux ' + of(cur.month) + ', au ' + day(cur.through) : '');
     const cur = (store.months || []).slice(-1)[0];
     const a = cur ? cur.actual : {};
+    $('#plan-why').textContent = p.why + (cur ? ' Les chiffres « aujourd\'hui » sont ceux ' + of(cur.month) + ', au ' + day(cur.through) : '');
     const daysIn = cur ? new Date(Date.UTC(+cur.month.slice(0, 4), +cur.month.slice(5, 7), 0)).getUTCDate() : 30;
     const elapsed = cur ? Math.min(daysIn, +cur.through.slice(8, 10)) : 0;
     const rows = [
