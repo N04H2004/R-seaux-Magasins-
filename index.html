@@ -257,8 +257,6 @@ footer { margin-top: 10px; }
 .plan-tbl tr.cur td { background: var(--accent-soft); }
 .plan-tbl tr.real td { color: var(--muted); border-bottom: 2px solid var(--line); }
 .plan-tbl tr.real td small { display: block; font-size: 11px; font-weight: 400; }
-.plan-tbl tr.real td.miss { color: var(--bad); }
-.plan-tbl tr.real td.hit { color: var(--good); }
 .plan-tbl tr.target td { font-weight: 700; }
 .plan-tbl .stars.sm { font-size: 12px; }
 </style>
@@ -288,7 +286,7 @@ footer { margin-top: 10px; }
       <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
     </summary>
     <div class="acc-body">
-      <p class="note" style="margin:0">Une étoile par objectif atteint. Les objectifs sont fixés au début de chaque mois à partir du mois d'avant, et la note finale tombe le lundi qui suit la fin du mois.</p>
+      <p class="note" style="margin:0" id="grade-note"></p>
       <ul class="goals" id="goals"></ul>
       <h3 class="hist-title">Mois par mois</h3>
       <ul class="hist" id="hist"></ul>
@@ -301,7 +299,7 @@ footer { margin-top: 10px; }
       <p class="note" style="margin:0" id="plan-why"></p>
       <ul class="goals" id="plan-goals"></ul>
       <h3 class="hist-title">Le plan mois par mois</h3>
-      <p class="note" style="margin:0">Les objectifs de chaque mois, qui donnent les étoiles. Ils montent pas à pas jusqu'à la cible. La première ligne montre le mois de départ tel qu'il a été réalisé : en vert ce qui atteint déjà l'objectif du mois suivant, en rouge ce qui n'y est pas encore.</p>
+      <p class="note" style="margin:0">Les objectifs de chaque mois, qui donnent les étoiles. Ils montent pas à pas jusqu'à la cible. La première ligne, en gris, est le point de départ : ce qui a été réalisé avant le plan, pour voir le chemin qui reste.</p>
       <div class="tbl-wrap plan-tbl"><table id="plan-table"></table></div>
     </div>
   </details>
@@ -724,6 +722,11 @@ footer { margin-top: 10px; }
     const st = $('#grade-stars'); st.replaceWith(Object.assign(starsEl(n), { id: 'grade-stars' }));
     $('#grade-sub').textContent = final ? n + ' objectif' + (n > 1 ? 's' : '') + ' sur 5 atteint' + (n > 1 ? 's' : '')
       : 'En cours · ' + n + ' sur 5 déjà atteint' + (n > 1 ? 's' : '') + ' · ' + (daysIn - elapsed > 0 ? 'fin du mois dans ' + (daysIn - elapsed) + ' j' : 'dernier jour');
+    const inPlan = store.plan && store.plan.months && store.plan.months[cur.month];
+    $('#grade-note').textContent = 'Une étoile par objectif atteint. ' + (inPlan
+      ? 'Les objectifs de ce mois viennent du plan « Objectifs ' + monthName(store.plan.target.month).toLowerCase() + ' ».'
+      : store.plan ? 'Les objectifs de ce mois ont été fixés avant le plan, à partir du mois d\'avant. Le plan commence le mois suivant.'
+      : 'Les objectifs sont fixés au début de chaque mois à partir du mois d\'avant.') + ' La note finale tombe le lundi qui suit la fin du mois.';
     $('#goals').replaceChildren(...goalsOf(cur).map((g) => {
       const a = cur.actual[g.k], t = cur.goals[g.k], ok = reached(cur.goals, cur.actual, g.k);
       let cls, tag;
@@ -788,8 +791,8 @@ footer { margin-top: 10px; }
     if (startM) {
       const sa = startM.actual, first = Object.values(p.months)[0];
       const tr = el('tr', 'real');
-      const c0 = el('td', '', shortMonth(startM.month)); c0.append(el('small', '', startM.status === 'final' ? 'réalisé' : 'au ' + day(startM.through)));
-      const cell = (v, goal, f) => { const td = el('td', v == null ? '' : v >= goal ? 'hit' : 'miss', v == null ? '—' : f(v)); return td; };
+      const c0 = el('td', '', shortMonth(startM.month)); c0.append(el('small', '', 'départ' + (startM.status === 'final' ? '' : ', au ' + day(startM.through))));
+      const cell = (v, goal, f) => el('td', '', v == null ? '—' : f(v));
       tr.append(c0, cell(sa.followers, first.followers, int), cell(sa.views, first.views, int), cell(sa.topReel, first.topReel, int),
         cell(sa.watch, first.watch, (v) => String(v).replace('.', ',') + ' s'), cell(sa.posts, first.posts, int));
       tbody.append(tr);
