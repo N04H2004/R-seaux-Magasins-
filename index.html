@@ -248,17 +248,15 @@ footer { margin-top: 10px; }
 .hist .m small { display: block; font-size: 12.5px; color: var(--muted); font-weight: 400; }
 .acc > summary circle { fill: none; }
 .plan-tbl { max-height: none; border-top: 0; }
-.plan-tbl table { font-size: 12px; }
+.plan-tbl table { font-size: 11.5px; }
 .plan-tbl th, .plan-tbl td { padding: 8px 3px; text-align: right; white-space: nowrap; }
 .plan-tbl th:first-child, .plan-tbl td:first-child { text-align: left; }
 .plan-tbl th { padding: 8px 6px; position: static; background: none; }
 .plan-tbl td { font-family: var(--font-mono); }
 .plan-tbl td:first-child { font-family: var(--font-body); font-weight: 500; }
 .plan-tbl tr.cur td { background: var(--accent-soft); }
-.plan-tbl tr.real td { color: var(--muted); border-bottom: 2px solid var(--line); }
-.plan-tbl tr.real td small { display: block; font-size: 11px; font-weight: 400; }
 .plan-tbl tr.target td { font-weight: 700; }
-.plan-tbl .stars.sm { font-size: 12px; }
+.plan-tbl .stars.sm { font-size: 12px; display: flex; margin-top: 2px; }
 </style>
 </head>
 <body>
@@ -299,7 +297,7 @@ footer { margin-top: 10px; }
       <p class="note" style="margin:0" id="plan-why"></p>
       <ul class="goals" id="plan-goals"></ul>
       <h3 class="hist-title">Le plan mois par mois</h3>
-      <p class="note" style="margin:0">Les objectifs de chaque mois, qui donnent les étoiles. Ils montent pas à pas jusqu'à la cible. La première ligne, en gris, est le point de départ : ce qui a été réalisé avant le plan, pour voir le chemin qui reste.</p>
+      <p class="note" style="margin:0">Les objectifs de chaque mois, qui donnent les étoiles. Ils montent pas à pas jusqu'à la cible. Les étoiles s'affichent à côté de chaque mois noté. Octobre avait ses propres objectifs, fixés avant le plan.</p>
       <div class="tbl-wrap plan-tbl"><table id="plan-table"></table></div>
     </div>
   </details>
@@ -786,23 +784,14 @@ footer { margin-top: 10px; }
     const thead = el('thead'); thead.append(head);
     const tbody = el('tbody');
     const done = new Map((store.months || []).filter((m) => m.goals).map((m) => [m.month, m]));
-    // the plan's starting month, as measured, so it can be read against the first monthly goals
-    const startM = (store.months || []).find((m) => m.month === p.start.month);
-    if (startM) {
-      const sa = startM.actual, first = Object.values(p.months)[0];
-      const tr = el('tr', 'real');
-      const c0 = el('td', '', shortMonth(startM.month)); c0.append(el('small', '', 'départ' + (startM.status === 'final' ? '' : ', au ' + day(startM.through))));
-      const cell = (v, goal, f) => el('td', '', v == null ? '—' : f(v));
-      tr.append(c0, cell(sa.followers, first.followers, int), cell(sa.views, first.views, int), cell(sa.topReel, first.topReel, int),
-        cell(sa.watch, first.watch, (v) => String(v).replace('.', ',') + ' s'), cell(sa.posts, first.posts, int));
-      tbody.append(tr);
-    }
-    Object.entries(p.months).forEach(([m, g]) => {
+    // months graded before the plan started (their own goals, set from the month before) come first, like any other month
+    const earlier = (store.months || []).filter((m) => m.goals && !p.months[m.month]).map((m) => [m.month, m.goals]);
+    [...earlier, ...Object.entries(p.months)].forEach(([m, g]) => {
       const tr = el('tr', (cur && cur.month === m ? 'cur' : '') + (m === p.target.month ? ' target' : ''));
       const first = el('td', '', shortMonth(m));
       const dm = done.get(m);
-      if (dm) { first.append(' '); first.append(starsEl(starsOf(dm), 'sm')); }
-      tr.append(first, el('td', '', int(g.followers)), el('td', '', int(g.views)), el('td', '', int(g.topReel)), el('td', '', g.watch + ' s'), el('td', '', int(g.posts)));
+      if (dm) first.append(starsEl(starsOf(dm), 'sm'));
+      tr.append(first, el('td', '', int(g.followers)), el('td', '', int(g.views)), el('td', '', g.topReel == null ? '—' : int(g.topReel)), el('td', '', g.watch + ' s'), el('td', '', int(g.posts)));
       tbody.append(tr);
     });
     $('#plan-table').replaceChildren(thead, tbody);
