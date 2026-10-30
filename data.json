@@ -1292,21 +1292,21 @@
      },
      "goals": {
       "posts": 18,
-      "views": 6780,
-      "topReel": 1410,
-      "followers": 226,
-      "watch": 13
+      "views": 8530,
+      "topReel": 1820,
+      "followers": 272,
+      "watch": 15
      }
     }
    ],
    "plan": {
     "start": {
-     "month": "2026-10",
-     "followers": 240,
-     "views": 11000,
-     "engaged": 380,
-     "watch": 14.4,
-     "topReel": 1095
+     "month": "2026-09",
+     "followers": 205,
+     "views": 6160,
+     "engaged": 244,
+     "watch": 10.9,
+     "topReel": 1281
     },
     "target": {
      "month": "2027-04",
@@ -1318,45 +1318,53 @@
      "topReel": 15000
     },
     "months": {
+     "2026-10": {
+      "posts": 18,
+      "views": 8530,
+      "engaged": 298,
+      "followers": 272,
+      "watch": 15,
+      "topReel": 1820
+     },
      "2026-11": {
       "posts": 17,
-      "views": 14590,
-      "engaged": 446,
-      "followers": 326,
+      "views": 11800,
+      "engaged": 365,
+      "followers": 362,
       "watch": 16,
-      "topReel": 3000
+      "topReel": 2590
      },
      "2026-12": {
       "posts": 18,
-      "views": 19360,
-      "engaged": 525,
-      "followers": 442,
+      "views": 16340,
+      "engaged": 447,
+      "followers": 481,
       "watch": 17,
-      "topReel": 4100
+      "topReel": 3680
      },
      "2027-01": {
       "posts": 18,
-      "views": 25690,
-      "engaged": 616,
-      "followers": 600,
+      "views": 22620,
+      "engaged": 546,
+      "followers": 639,
       "watch": 18,
-      "topReel": 5700
+      "topReel": 5230
      },
      "2027-02": {
       "posts": 16,
-      "views": 34090,
-      "engaged": 724,
-      "followers": 814,
+      "views": 31310,
+      "engaged": 668,
+      "followers": 849,
       "watch": 19,
-      "topReel": 7900
+      "topReel": 7430
      },
      "2027-03": {
       "posts": 18,
-      "views": 45220,
-      "engaged": 851,
-      "followers": 1105,
+      "views": 43340,
+      "engaged": 817,
+      "followers": 1129,
       "watch": 20,
-      "topReel": 10900
+      "topReel": 10550
      },
      "2027-04": {
       "posts": 17,
@@ -1367,7 +1375,7 @@
       "topReel": 15000
      }
     },
-    "why": "Environ 900 clients du quartier et 600 abonnés d'ailleurs d'ici avril 2027, avec chaque mois au moins un Reel qui perce bien au-delà des abonnés, et des Reels regardés 20 s en moyenne."
+    "why": "Le plan part de fin septembre, au début du travail sur le compte : environ 900 clients du quartier et 600 abonnés d'ailleurs d'ici avril 2027, chaque mois au moins un Reel qui perce bien au-delà des abonnés, et des Reels regardés 20 s en moyenne."
    }
   }
  ]
