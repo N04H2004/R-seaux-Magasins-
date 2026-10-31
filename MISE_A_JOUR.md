@@ -5,8 +5,7 @@ Instructions suivies par la tâche planifiée « MAJ Magasins ».
 Le site (statistiques Instagram de deux magasins à Nice) est hébergé sur Vercel depuis ce dépôt, branche `claude/exciting-darwin-jm5s48` : chaque push redéploie le site.
 
 ## Fichiers
-- `index.html` : page statique autonome. Toutes les données sont dans `<script id="data" type="application/json">…</script>` (un seul objet JSON sur une ligne). Ne touche pas au reste de la page (CSS, JS, structure).
-- `data.json` : copie lisible (indentée, 1 espace) du même objet JSON. Les deux doivent rester identiques.
+- `data.json` : toutes les données des statistiques (JSON indenté, 1 espace). C'est le seul fichier que tu modifies. L'appli est protégée par une connexion : `index.html` ne contient plus aucune donnée, elle les charge depuis `/api/data`, qui lit `data.json`. Ne touche pas à `index.html`, ni aux dossiers `api/` et `assets/`.
 
 ## Étapes
 1. Travaille sur la branche `claude/exciting-darwin-jm5s48`. Lis `data.json` pour connaître le schéma exact et le ton des textes actuels.
@@ -21,7 +20,7 @@ Le site (statistiques Instagram de deux magasins à Nice) est hébergé sur Verc
 4. Mets à jour `updated` (date du jour) et `period` (`start`/`end`).
 4bis. Mets à jour la **note du mois** de chaque magasin (tableau `months`, voir la section « Note du mois » plus bas).
 5. Réécris pour chaque magasin, à partir des nouveaux chiffres uniquement, `summary` (4 constats courts) et `recos` (5 à 7 paires [titre, explication]), en français, tutoiement, même style concret que les textes actuels. Chaque affirmation doit être vérifiable dans les données.
-6. Écris `data.json` (indenté, `ensure_ascii=False`) et remplace le contenu du `<script id="data">` d'`index.html` par le même JSON sur une ligne (`json.dumps(..., ensure_ascii=False)`). Vérifie que `index.html` s'ouvre sans erreur JavaScript (Playwright : charge `file://…/index.html`, aucun `pageerror`, le `h1` affiche un nom de magasin).
+6. Écris `data.json` (indenté, `ensure_ascii=False`), puis lance `node scripts/check-data.js` : il doit afficher « data.json OK ». S'il signale un problème, corrige `data.json` et relance.
 7. Commit (« Mise à jour des statistiques au JJ/MM/AAAA ») et `git push -u origin claude/exciting-darwin-jm5s48`. Pas de pull request, aucune autre branche.
 
 ## Note du mois (`months`)

@@ -51,6 +51,8 @@
 :root[data-theme="dark"][data-brand="netto"] { --accent: #ff8a2a; --accent-ink: #ffa35c; --accent-soft: #3a2410; --on-accent: #16191f; }
 
 * { box-sizing: border-box; }
+/* layout rules (display: flex/grid) must never win over the hidden attribute */
+[hidden] { display: none !important; }
 body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
 a { color: var(--accent-ink); }
@@ -207,8 +209,7 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--li
 footer { margin-top: 10px; }
 @media (max-width: 480px) {
   .logo { display: none; }
-  .bar-right { flex: 1; min-width: 0; }
-  .switch { flex: 1; min-width: 0; }
+  .switch { min-width: 0; }
   .switch button { flex: 1; padding-inline: 8px; }
   .k3 { padding: 12px 10px 10px; }
 }
@@ -274,6 +275,105 @@ footer { margin-top: 10px; }
 .theme-btn .sun { display: none; }
 .theme-btn[aria-pressed="true"] .sun { display: block; }
 .theme-btn[aria-pressed="true"] .moon { display: none; }
+
+/* ---------- signed-in shell: greeting bar, account menu, bottom tabs ---------- */
+.bar-in { flex-wrap: wrap; }
+.hello { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.hello img { border-radius: 9px; flex: none; }
+.hello small { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; line-height: 1.2; }
+.hello b { display: block; font-family: var(--font-display); font-weight: 800; font-stretch: 80%; font-size: 21px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.switch { order: 3; flex-basis: 100%; }
+@media (min-width: 821px) { .switch { order: 0; flex-basis: auto; } }
+body[data-tab="planning"] .switch { display: none; }
+.menu { position: relative; }
+.menu > summary { list-style: none; }
+.menu > summary::-webkit-details-marker { display: none; }
+.avatar { width: 40px; height: 40px; border-radius: 999px; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font: 700 16px/1 var(--font-body); cursor: pointer; user-select: none; }
+.menu-pop { position: absolute; right: 0; top: 48px; z-index: 40; min-width: 240px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.18); padding: 6px; display: flex; flex-direction: column; }
+.menu-who { padding: 10px 12px 8px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+.menu-who b { display: block; }
+.menu-who small { color: var(--muted); font-size: 13px; }
+.menu-pop button { all: unset; padding: 12px; border-radius: 10px; cursor: pointer; font-size: 15px; }
+.menu-pop button:hover, .menu-pop button:focus-visible { background: var(--bg); }
+.menu-pop .danger { color: var(--bad); }
+body.signed { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: 1fr 1fr; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.tabbar button { all: unset; position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 0 8px; font: 600 12px/1 var(--font-body); color: var(--muted); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.tabbar button[aria-current="page"] { color: var(--accent-ink); }
+.tabbar svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.badge { position: absolute; top: 4px; left: calc(50% + 8px); min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 999px; background: var(--bad); color: #fff; font: 700 11px/18px var(--font-body); font-style: normal; text-align: center; }
+
+/* ---------- planning ---------- */
+.pl-top { display: flex; flex-direction: column; gap: 12px; }
+.pl-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.pl-title h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-stretch: 75%; font-size: 32px; text-transform: uppercase; line-height: 1; }
+.week-nav { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 8px; }
+.week-nav button { all: unset; width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; cursor: pointer; color: var(--ink); }
+.week-nav button:hover { background: var(--bg); }
+.week-nav svg, .fab svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.wk-mid { flex: 1; text-align: center; display: flex; flex-direction: column; }
+.wk-mid b { font-size: 16px; }
+.wk-mid small { color: var(--muted); font-size: 13px; }
+.pl-props { background: var(--accent-soft); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.pl-props h2 { margin: 0; font-size: 16px; }
+.days { display: flex; flex-direction: column; gap: 10px; }
+.day { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.day.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.day-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.day-h b { font-weight: 600; }
+.day-h small { color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
+.day-empty { color: var(--muted); font-size: 13.5px; margin: 0; }
+.shift { all: unset; display: flex; flex-direction: column; gap: 4px; background: var(--bg); border-radius: 10px; padding: 10px 12px; cursor: default; }
+button.shift { cursor: pointer; }
+.shift.proposed { background: var(--accent-soft); }
+.shift.declined { opacity: .75; }
+.sh-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.sh-time { font-family: var(--font-mono); font-size: 14px; font-weight: 500; }
+.sh-dur { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.sh-note { font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.sh-note.muted { color: var(--muted); font-style: italic; }
+.sh-tag { align-self: flex-start; font: 600 12px/1 var(--font-body); padding: 4px 8px; border-radius: 999px; background: var(--grid); color: var(--muted); }
+.shift.proposed .sh-tag { background: var(--surface); color: var(--accent-ink); }
+.shift.declined .sh-tag { background: color-mix(in srgb, var(--bad) 12%, transparent); color: var(--bad); }
+.sh-acts { display: flex; gap: 8px; margin-top: 4px; }
+.sh-acts .btn { padding: 9px 14px; }
+.fab { position: fixed; right: 16px; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 25; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 14px 20px; background: var(--accent); color: var(--on-accent); font: 700 15px/1 var(--font-body); box-shadow: 0 8px 24px rgba(0,0,0,.22); cursor: pointer; }
+.fab:disabled { opacity: .5; box-shadow: none; }
+#planning { padding-bottom: 96px; }
+.btn.danger { background: color-mix(in srgb, var(--bad) 12%, transparent); color: var(--bad); }
+.btn.ok { background: var(--good); color: #fff; }
+
+/* ---------- form sheet ---------- */
+.sheet { border: 0; padding: 0; margin: auto auto 0; width: 100%; max-width: 560px; max-height: 92dvh; border-radius: 20px 20px 0 0; background: var(--surface); color: var(--ink); }
+@media (min-width: 600px) { .sheet { margin: auto; border-radius: 20px; } }
+.sheet::backdrop { background: rgba(0,0,0,.45); }
+.sheet form { padding: 20px 16px calc(18px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 14px; }
+.sheet h2 { margin: 0; font-size: 20px; }
+.sheet-btns { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.sheet-btns #sheet-ok { flex: 1; max-width: 220px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fld { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--muted); }
+.fld input, .fld textarea, .fld select, #pl-cm { font: 16px var(--font-body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; width: 100%; box-sizing: border-box; }
+.fld textarea { min-height: 96px; resize: vertical; }
+#pl-cm { width: auto; padding: 8px 12px; font-size: 15px; }
+.form-err { margin: 0; color: var(--bad); font-size: 14px; font-weight: 500; }
+
+/* ---------- sign-in ---------- */
+.auth { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px calc(24px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
+.auth-in { width: 100%; max-width: 380px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.auth-logo { border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+.auth h1 { margin: 6px 0 0; font-family: var(--font-display); font-weight: 800; font-stretch: 75%; font-size: 36px; text-transform: uppercase; line-height: 1; }
+.auth .note { margin: 0 0 8px; }
+.seg { display: flex; gap: 4px; width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px; box-sizing: border-box; }
+.seg button { all: unset; flex: 1; text-align: center; padding: 10px 8px; border-radius: 999px; font: 600 14px/1 var(--font-body); color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+#auth-form { width: 100%; display: flex; flex-direction: column; gap: 12px; margin-top: 8px; text-align: left; }
+#auth-form label { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--muted); }
+#auth-form input { font: 16px var(--font-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px; }
+.btn.big { width: 100%; padding: 15px; font-size: 16px; margin-top: 4px; }
+#auth-help { text-align: center; }
+.toast { position: fixed; left: 50%; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 60; background: var(--ink); color: var(--bg); padding: 11px 16px; border-radius: 999px; font: 600 14px/1.2 var(--font-body); transition: opacity .2s, transform .2s; max-width: calc(100vw - 32px); }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
 </style>
 </head>
 <body>
@@ -286,20 +386,31 @@ footer { margin-top: 10px; }
 })();
 </script>
 
+<div id="app" hidden>
 <header class="bar">
   <div class="bar-in">
-    <div class="logo"><i></i>Mes Réseaux</div>
+    <div class="hello"><img src="/assets/icon-192.png" alt="" width="36" height="36"><div><small>Mes Réseaux</small><b id="hello">Bonjour</b></div></div>
     <div class="bar-right">
-      <nav class="switch" id="switch" aria-label="Choisir le magasin"></nav>
       <button type="button" class="theme-btn" id="theme-btn" aria-label="Mode sombre" aria-pressed="false">
         <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
         <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
       </button>
+      <details class="menu" id="menu">
+        <summary class="avatar" id="avatar" aria-label="Mon compte">?</summary>
+        <div class="menu-pop">
+          <div class="menu-who"><b id="menu-name"></b><small id="menu-role"></small></div>
+          <button type="button" data-act="code">Changer mon code</button>
+          <button type="button" data-act="reset" id="menu-reset" hidden>Réinitialiser le code d'un compte</button>
+          <button type="button" data-act="invites" id="menu-invites" hidden>Codes d'invitation</button>
+          <button type="button" data-act="logout" class="danger">Se déconnecter</button>
+        </div>
+      </details>
     </div>
+    <nav class="switch" id="switch" aria-label="Choisir le magasin"></nav>
   </div>
 </header>
 
-<main class="wrap">
+<main class="wrap" id="stats">
   <section class="hero-card">
     <img id="hero-img" src="assets/cessole.jpg" alt="" width="1000" height="562">
     <div class="hero-meta">
@@ -467,10 +578,69 @@ footer { margin-top: 10px; }
   </footer>
 </main>
 
-<script id="data" type="application/json">{"updated": "2026-10-26", "period": {"start": "2026-09-26", "end": "2026-10-25"}, "source": "Instagram Insights via Supermetrics", "stores": [{"id": "netto", "name": "Netto Temple", "handle": "netto.temple", "place": "Place Fontaine du Temple, Nice", "brand": "netto", "followers": 94, "mediaCount": 14, "compare": {"views": 4154, "viewsPrev": 1707, "engaged": 164, "engagedPrev": 78}, "daily": [{"date": "2026-09-26", "followers": null, "reach": 17, "views": 89, "engaged": 2}, {"date": "2026-09-27", "followers": null, "reach": 10, "views": 48, "engaged": 2}, {"date": "2026-09-28", "followers": null, "reach": 32, "views": 69, "engaged": 1}, {"date": "2026-09-29", "followers": null, "reach": 48, "views": 110, "engaged": 6}, {"date": "2026-09-30", "followers": null, "reach": 46, "views": 187, "engaged": 7}, {"date": "2026-10-01", "followers": null, "reach": 14, "views": 514, "engaged": 27}, {"date": "2026-10-02", "followers": null, "reach": 8, "views": 152, "engaged": 8}, {"date": "2026-10-03", "followers": null, "reach": 8, "views": 89, "engaged": 1}, {"date": "2026-10-04", "followers": null, "reach": 8, "views": 69, "engaged": 3}, {"date": "2026-10-05", "followers": null, "reach": 30, "views": 71, "engaged": 3}, {"date": "2026-10-06", "followers": null, "reach": 11, "views": 46, "engaged": 1}, {"date": "2026-10-07", "followers": null, "reach": 37, "views": 137, "engaged": 2}, {"date": "2026-10-08", "followers": null, "reach": 12, "views": 551, "engaged": 29}, {"date": "2026-10-09", "followers": null, "reach": 7, "views": 533, "engaged": 29}, {"date": "2026-10-10", "followers": null, "reach": 2, "views": 89, "engaged": 4}, {"date": "2026-10-11", "followers": null, "reach": 1, "views": 86, "engaged": 5}, {"date": "2026-10-12", "followers": null, "reach": 35, "views": 146, "engaged": 1}, {"date": "2026-10-13", "followers": null, "reach": 9, "views": 78, "engaged": 2}, {"date": "2026-10-14", "followers": null, "reach": 4, "views": 77, "engaged": 1}, {"date": "2026-10-15", "followers": null, "reach": 2, "views": 38, "engaged": 0}, {"date": "2026-10-16", "followers": null, "reach": 1, "views": 51, "engaged": 1}, {"date": "2026-10-17", "followers": null, "reach": 0, "views": 11, "engaged": 0}, {"date": "2026-10-18", "followers": null, "reach": 0, "views": 9, "engaged": 0}, {"date": "2026-10-19", "followers": null, "reach": 3, "views": 27, "engaged": 1}, {"date": "2026-10-20", "followers": null, "reach": 2, "views": 28, "engaged": 1}, {"date": "2026-10-21", "followers": null, "reach": 119, "views": 243, "engaged": 5}, {"date": "2026-10-22", "followers": null, "reach": 251, "views": 419, "engaged": 15}, {"date": "2026-10-23", "followers": null, "reach": 17, "views": 64, "engaged": 4}, {"date": "2026-10-24", "followers": null, "reach": 4, "views": 79, "engaged": 1}, {"date": "2026-10-25", "followers": null, "reach": 9, "views": 44, "engaged": 2}], "posts": [{"id": "18129656725872091", "time": "2026-10-22 10:21", "format": "Reel", "title": "Octobre Rose : l'équipe mobilisée", "views": 377, "reach": 268, "interactions": 23, "likes": 18, "comments": 2, "saves": 2, "shares": 0, "link": "https://www.instagram.com/reel/Deyilycu-UZ/", "watch": 11, "skip": 58.8}, {"id": "18123850891911285", "time": "2026-09-24 14:24", "format": "Reel", "title": "Gyozas poêlés, sauce soja sucrée", "views": 313, "reach": 244, "interactions": 14, "likes": 11, "comments": 0, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/Ddq4IYIO1TJ/", "watch": 6, "skip": 88.7}, {"id": "18112960874082902", "time": "2026-09-10 11:30", "format": "Photo", "title": "Photo sans légende (10 septembre)", "views": 244, "reach": 73, "interactions": 10, "likes": 10, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdGhJSvOFKv/", "watch": null, "skip": null}, {"id": "18154147312511822", "time": "2026-09-10 09:32", "format": "Carrousel", "title": "Recette n°1 : boulettes de bœuf, champignons", "views": 213, "reach": 67, "interactions": 14, "likes": 14, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdGTtTIDtjB/", "watch": null, "skip": null}, {"id": "17885859936504766", "time": "2026-10-21 14:19", "format": "Reel", "title": "Gratin de rösti à la mimolette", "views": 191, "reach": 139, "interactions": 5, "likes": 5, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DewZD-dO5qf/", "watch": 2, "skip": 89.7}, {"id": "18142088107520488", "time": "2026-09-30 11:45", "format": "Carrousel", "title": "Recette n°4 : croque-monsieur gourmand", "views": 190, "reach": 55, "interactions": 9, "likes": 9, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/Dd6C0b_DukP/", "watch": null, "skip": null}, {"id": "18137681068722180", "time": "2026-09-17 11:23", "format": "Carrousel", "title": "Recette n°2 : poêlée de bœuf haché", "views": 186, "reach": 55, "interactions": 11, "likes": 10, "comments": 0, "saves": 1, "shares": 0, "link": "https://www.instagram.com/p/DdYh9zLjpPe/", "watch": null, "skip": null}, {"id": "18099603233295999", "time": "2026-09-10 11:30", "format": "Photo", "title": "Photo sans légende (10 septembre)", "views": 169, "reach": 71, "interactions": 15, "likes": 15, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdGhMv-ueP1/", "watch": null, "skip": null}, {"id": "17907866139521131", "time": "2026-09-22 15:11", "format": "Reel", "title": "Ramune, boissons japonaises", "views": 168, "reach": 79, "interactions": 11, "likes": 11, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/Ddlz9OvouBa/", "watch": 7, "skip": 70.6}, {"id": "18577207054068999", "time": "2026-09-23 14:55", "format": "Carrousel", "title": "Recette n°3 : poulet yakitori", "views": 164, "reach": 52, "interactions": 9, "likes": 9, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdoXBwaDnlw/", "watch": null, "skip": null}, {"id": "18017230985728096", "time": "2026-09-10 11:30", "format": "Photo", "title": "Photo sans légende (10 septembre)", "views": 137, "reach": 67, "interactions": 11, "likes": 11, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdGhNzuuUK_/", "watch": null, "skip": null}, {"id": "17883303897619981", "time": "2026-09-08 10:32", "format": "Photo", "title": "Foire aux vins : 2+1 offert", "views": 120, "reach": 54, "interactions": 13, "likes": 13, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdBQ6Oqjmac/", "watch": null, "skip": null}, {"id": "18242840755315707", "time": "2026-09-29 20:08", "format": "Reel", "title": "Soda ou bière ?", "views": 101, "reach": 68, "interactions": 8, "likes": 7, "comments": 0, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/Dd4XWNxO83A/", "watch": 5, "skip": 66.7}, {"id": "17914486230467433", "time": "2026-10-07 14:50", "format": "Reel", "title": "Recette n°5 : pâtes crémeuses au pesto", "views": 99, "reach": 65, "interactions": 4, "likes": 4, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DeMZfkUO6fE/", "watch": 4, "skip": 81.5}], "audience": null, "summary": ["Les vues ont été multipliées par 2,4 (4 154 contre 1 707) et les comptes engagés doublent (164 contre 78), mais sur une petite base : le compte a démarré le 8 septembre.", "Les plus gros pics (1er, 8 et 9 octobre : 514, 551 et 533 vues) tombent des jours sans publication dans le fil : ce sont très probablement des stories.", "Le Reel Octobre Rose avec l'équipe (22 octobre) est la meilleure publication : 377 vues, 23 interactions et 11 secondes de visionnage moyen.", "Les Reels recettes perdent la plupart des gens tout de suite : 89,7 % de passage sur le gratin de rösti, 81,5 % sur les pâtes au pesto.", "Seulement 5 publications en 30 jours, aucune entre le 8 et le 20 octobre : les vues tombent à 9-11 par jour les 17 et 18 octobre."], "recos": [["Publier au moins 2 fois par semaine", "Il n'y a eu que 5 publications en 30 jours et un trou du 8 au 20 octobre, avec 9 et 11 vues les 18 et 17 octobre. Un rythme fixe (recette le mardi, produit ou promo le vendredi) vaut mieux que des rafales."], ["Mettre l'équipe en avant", "Le Reel Octobre Rose est le meilleur du mois (377 vues, 11 s de visionnage, 58,8 % de passage, le plus bas des Reels). Des visages connus du quartier accrochent plus qu'une recette seule."], ["Soigner les 2 premières secondes des Reels recettes", "Le gratin de rösti (2 s regardées) et les pâtes au pesto (4 s) sont passés par 89,7 % et 81,5 % des spectateurs. Montre le plat fini dès la première image avec le prix total en gros, puis la décomposition."], ["Reels pour se faire découvrir, carrousels pour fidéliser", "En moyenne, les Reels du mois touchent 135 comptes contre 55 pour le carrousel croque-monsieur. Garde les deux formats."], ["Faire des stories régulièrement", "Les trois pics du mois (1er, 8 et 9 octobre) tombent sans publication dans le fil. Publie des stories plusieurs fois par semaine (arrivages, promos du jour, coulisses) et range les meilleures en « À la une »."], ["Demander explicitement l'action", "Sur les 14 publications, il y a 3 enregistrements, 2 commentaires et 2 partages en tout. Termine chaque recette par « Enregistre-la » ou « Tague la personne avec qui tu la ferais »."], ["Viser les 100 abonnés", "Tu en as 94. À 100, Instagram donnera les gains d'abonnés par jour, l'âge et la ville de l'audience et ses heures de connexion. Un QR code en caisse ou un petit jeu-concours suffit souvent."]], "months": [{"month": "2026-09", "status": "reference", "through": "2026-09-30", "actual": {"posts": 11, "views": 2210, "engaged": 96, "followers": null, "watch": 5.7, "reels": 3, "topReel": 313}, "goals": null}, {"month": "2026-10", "status": "in_progress", "through": "2026-10-28", "actual": {"posts": 3, "views": 3819, "engaged": 147, "followers": 94, "watch": 5.7, "reels": 3, "topReel": 377}, "goals": {"posts": 18, "views": 2430, "engaged": 106, "followers": 100, "watch": 8}}], "plan": null}, {"id": "cessole", "name": "Intermarché Cessole", "handle": "intermarche.cessole", "place": "143 boulevard de Cessole, Nice", "brand": "intermarche", "followers": 236, "mediaCount": 28, "compare": {"views": 12285, "viewsPrev": 3019, "engaged": 444, "engagedPrev": 111}, "daily": [{"date": "2026-09-26", "followers": 19, "reach": 431, "views": 1783, "engaged": 71}, {"date": "2026-09-27", "followers": 6, "reach": 77, "views": 299, "engaged": 11}, {"date": "2026-09-28", "followers": 1, "reach": 95, "views": 277, "engaged": 12}, {"date": "2026-09-29", "followers": 2, "reach": 197, "views": 542, "engaged": 21}, {"date": "2026-09-30", "followers": 3, "reach": 80, "views": 338, "engaged": 18}, {"date": "2026-10-01", "followers": 3, "reach": 265, "views": 918, "engaged": 30}, {"date": "2026-10-02", "followers": 3, "reach": 344, "views": 707, "engaged": 26}, {"date": "2026-10-03", "followers": 1, "reach": 55, "views": 296, "engaged": 5}, {"date": "2026-10-04", "followers": 1, "reach": 36, "views": 154, "engaged": 4}, {"date": "2026-10-05", "followers": 0, "reach": 269, "views": 600, "engaged": 23}, {"date": "2026-10-06", "followers": 5, "reach": 527, "views": 971, "engaged": 39}, {"date": "2026-10-07", "followers": 5, "reach": 343, "views": 996, "engaged": 29}, {"date": "2026-10-08", "followers": 2, "reach": 372, "views": 812, "engaged": 30}, {"date": "2026-10-09", "followers": 0, "reach": 223, "views": 614, "engaged": 30}, {"date": "2026-10-10", "followers": 2, "reach": 48, "views": 204, "engaged": 5}, {"date": "2026-10-11", "followers": 0, "reach": 44, "views": 154, "engaged": 6}, {"date": "2026-10-12", "followers": 1, "reach": 201, "views": 389, "engaged": 21}, {"date": "2026-10-13", "followers": 0, "reach": 110, "views": 245, "engaged": 8}, {"date": "2026-10-14", "followers": 0, "reach": 38, "views": 213, "engaged": 1}, {"date": "2026-10-15", "followers": 2, "reach": 80, "views": 275, "engaged": 5}, {"date": "2026-10-16", "followers": 0, "reach": 25, "views": 94, "engaged": 2}, {"date": "2026-10-17", "followers": 0, "reach": 11, "views": 21, "engaged": 1}, {"date": "2026-10-18", "followers": 0, "reach": 14, "views": 28, "engaged": 0}, {"date": "2026-10-19", "followers": 1, "reach": 18, "views": 55, "engaged": 2}, {"date": "2026-10-20", "followers": 2, "reach": 15, "views": 48, "engaged": 0}, {"date": "2026-10-21", "followers": 0, "reach": 113, "views": 241, "engaged": 7}, {"date": "2026-10-22", "followers": 2, "reach": 22, "views": 90, "engaged": 2}, {"date": "2026-10-23", "followers": 0, "reach": 15, "views": 120, "engaged": 1}, {"date": "2026-10-24", "followers": 1, "reach": 204, "views": 490, "engaged": 15}, {"date": "2026-10-25", "followers": 0, "reach": 92, "views": 311, "engaged": 19}], "posts": [{"id": "18092759651416284", "time": "2026-09-26 09:42", "format": "Reel", "title": "La Tribu Intermarché", "views": 1281, "reach": 481, "interactions": 137, "likes": 75, "comments": 14, "saves": 4, "shares": 39, "link": "https://www.instagram.com/reel/DdvhZjXsi6m/", "watch": 30, "skip": 58.2}, {"id": "17872887045638542", "time": "2026-10-05 19:50", "format": "Reel", "title": "Panier apéro à moins de 10 €", "views": 1100, "reach": 664, "interactions": 58, "likes": 43, "comments": 1, "saves": 0, "shares": 13, "link": "https://www.instagram.com/reel/DeHx4vrsAfb/", "watch": 16, "skip": 59.7}, {"id": "18150605239556844", "time": "2026-10-06 18:31", "format": "Reel", "title": "Dégustation du croustillant du traiteur asiatique", "views": 990, "reach": 616, "interactions": 62, "likes": 42, "comments": 1, "saves": 0, "shares": 18, "link": "https://www.instagram.com/reel/DeKNrRVMTuJ/", "watch": 16, "skip": 56.6}, {"id": "17957039604080610", "time": "2026-10-01 14:51", "format": "Reel", "title": "Réunion annuelle : Objectif 2027", "views": 929, "reach": 439, "interactions": 46, "likes": 40, "comments": 0, "saves": 0, "shares": 4, "link": "https://www.instagram.com/reel/Dd880XSMH5v/", "watch": 19, "skip": 50.7}, {"id": "18109009073269662", "time": "2026-10-08 16:42", "format": "Reel", "title": "À la rencontre de nos collaborateurs", "views": 888, "reach": 499, "interactions": 44, "likes": 37, "comments": 2, "saves": 0, "shares": 4, "link": "https://www.instagram.com/reel/DePK_6jML19/", "watch": 21, "skip": 62.3}, {"id": "18113204197834823", "time": "2026-09-25 12:13", "format": "Reel", "title": "POV : les courses qui dérapent", "views": 739, "reach": 454, "interactions": 27, "likes": 21, "comments": 0, "saves": 2, "shares": 4, "link": "https://www.instagram.com/reel/DdtN7xXsdTH/", "watch": 9, "skip": 44.4}, {"id": "18142032055592302", "time": "2026-10-09 09:29", "format": "Carrousel", "title": "Jogging Rose à Nice", "views": 650, "reach": 211, "interactions": 36, "likes": 34, "comments": 2, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DeQ-Y0ojUlj/", "watch": null, "skip": null}, {"id": "18118045889019771", "time": "2026-09-29 02:25", "format": "Reel", "title": "Panier veggie et bio à moins de 10 €", "views": 605, "reach": 334, "interactions": 35, "likes": 29, "comments": 0, "saves": 0, "shares": 4, "link": "https://www.instagram.com/reel/Dd1o5vvs_jI/", "watch": 15, "skip": 63.9}, {"id": "18039170216835343", "time": "2026-09-21 11:00", "format": "Reel", "title": "Panier à 9,98 € : environ 6 repas", "views": 500, "reach": 296, "interactions": 22, "likes": 21, "comments": 0, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/DdiyVNZM3U4/", "watch": 12, "skip": 68.9}, {"id": "18123698134906949", "time": "2026-10-12 20:10", "format": "Reel", "title": "Brunch gourmand à moins de 10 €", "views": 496, "reach": 307, "interactions": 31, "likes": 29, "comments": 0, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/DeZ2A6Esg6E/", "watch": 16, "skip": 59.2}, {"id": "17938720215391703", "time": "2026-10-24 21:40", "format": "Reel", "title": "Nouvelles baguettes goûtées par les clients", "views": 481, "reach": 275, "interactions": 32, "likes": 30, "comments": 0, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/De45Pa8xAYg/", "watch": 20, "skip": 59.0}, {"id": "18267985204305668", "time": "2026-10-02 19:48", "format": "Reel", "title": "Le hasard fait les courses (roue)", "views": 476, "reach": 298, "interactions": 24, "likes": 18, "comments": 0, "saves": 0, "shares": 5, "link": "https://www.instagram.com/reel/DeACiPPsjCa/", "watch": 13, "skip": 64.9}, {"id": "17933577702401217", "time": "2026-09-24 14:22", "format": "Reel", "title": "3 articles, 1 rayon : défi courses", "views": 429, "reach": 224, "interactions": 26, "likes": 23, "comments": 2, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/Ddq35KGMqng/", "watch": 15, "skip": 70.5}, {"id": "18018634421733056", "time": "2026-09-26 11:47", "format": "Reel", "title": "Raclette, tartiflette, Mont d'Or", "views": 423, "reach": 185, "interactions": 24, "likes": 22, "comments": 0, "saves": 0, "shares": 1, "link": "https://www.instagram.com/reel/DdvvyFQM2-L/", "watch": 6, "skip": 61.2}, {"id": "17902409727578779", "time": "2026-09-09 15:00", "format": "Reel", "title": "Soirée avant-première Foire aux vins", "views": 404, "reach": 177, "interactions": 20, "likes": 20, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DdEUUjnsegv/", "watch": 10, "skip": 65.7}, {"id": "18179878018426951", "time": "2026-09-23 14:59", "format": "Carrousel", "title": "Recette : fajitas au bœuf", "views": 354, "reach": 106, "interactions": 22, "likes": 22, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdoXb1fDCGn/", "watch": null, "skip": null}, {"id": "17896326705405892", "time": "2026-09-30 11:50", "format": "Carrousel", "title": "Recette : pâtes Boursin et lardons", "views": 335, "reach": 105, "interactions": 15, "likes": 14, "comments": 1, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/Dd6DW4CjO-N/", "watch": null, "skip": null}, {"id": "18122484142921035", "time": "2026-09-29 20:15", "format": "Reel", "title": "Celsius débarque", "views": 314, "reach": 153, "interactions": 15, "likes": 13, "comments": 1, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/Dd4YGy6MMGw/", "watch": 5, "skip": 73.1}, {"id": "18072811895481822", "time": "2026-09-22 15:08", "format": "Reel", "title": "Shots Yumi", "views": 303, "reach": 139, "interactions": 17, "likes": 17, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DdlzmBtsaz0/", "watch": 5, "skip": 71.1}, {"id": "18137176807619360", "time": "2026-09-09 11:39", "format": "Photo", "title": "Koh-Lanta à Intermarché Cessole", "views": 262, "reach": 98, "interactions": 11, "likes": 11, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/p/DdD89pYMmjv/", "watch": null, "skip": null}, {"id": "18134274196708723", "time": "2026-10-07 14:46", "format": "Reel", "title": "Raviolis gratinés tomate-mozzarella", "views": 257, "reach": 125, "interactions": 10, "likes": 10, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DeMZCPcsjcL/", "watch": 5, "skip": 70.4}, {"id": "18030158414675012", "time": "2026-09-08 15:04", "format": "Reel", "title": "Offre Foire aux vins", "views": 209, "reach": 103, "interactions": 13, "likes": 12, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DdBvtw7s-gL/", "watch": 4, "skip": 81.0}, {"id": "18079502660397067", "time": "2026-10-21 14:17", "format": "Reel", "title": "Tortellini gratinés jambon-raclette", "views": 185, "reach": 91, "interactions": 6, "likes": 6, "comments": 0, "saves": 0, "shares": 0, "link": "https://www.instagram.com/reel/DewY4PEsOt6/", "watch": 4, "skip": 66.3}], "audience": {"hours": [24.3929, 14.4643, 10.0357, 7.1429, 8, 12.5, 21.25, 34.5714, 42.3214, 47.6429, 48.2857, 51.5357, 56.2143, 57.9286, 54, 55.1429, 55.8571, 58.5357, 60.0714, 61.5, 61.8929, 64.8214, 54.1786, 38.5], "ages": [["13-17", 2], ["18-24", 35], ["25-34", 69], ["35-44", 52], ["45-54", 41], ["55-64", 27], ["65+", 10]], "cities": [["Nice", 107], ["Paris", 6], ["Abidjan", 4], ["Marseille", 3], ["Antony", 2], ["Cagnes-sur-Mer", 2], ["Châtenay-Malabry", 2], ["Clamart", 2]]}, "summary": ["Très forte progression : 12 285 vues contre 3 019 (×4,1) et 444 comptes engagés contre 111, avec 15 publications en 30 jours contre 8 la période d'avant.", "Meilleure journée : le 26 septembre (1 783 vues, 19 nouveaux abonnés sur 62 dans le mois), jour du Reel « La Tribu Intermarché », ta meilleure publication : 1 281 vues, 39 partages, 14 commentaires, 30 s de visionnage.", "Les vidéos d'équipe (Tribu, réunion Objectif 2027, interviews) et la série « Panier à moins de 10 € » marchent le mieux ; les Reels recettes (185 à 257 vues) et les nouveautés produit (Yumi, Celsius, 303 et 314 vues), le moins.", "Aucune publication du 13 au 20 octobre : les vues passent à 21-94 par jour du 16 au 20 octobre et il n'y a que 5 nouveaux abonnés en 8 jours.", "Le partage fait la différence : 96 partages en tout, dont 70 sur trois Reels (Tribu, croustillant du traiteur, panier apéro), mais seulement 6 enregistrements."], "recos": [["Faire de l'équipe le cœur du compte", "« La Tribu Intermarché » est le plus vu, le plus partagé, le plus commenté et le plus regardé. La réunion Objectif 2027 (929 vues) et l'interview de collaborateur (888 vues, 21 s) suivent. Lance un rendez-vous fixe chaque semaine : un portrait, un métier, une coulisse."], ["Faire du « Panier à moins de 10 € » une vraie série", "Le panier apéro a la plus grande portée du compte (664) et les trois autres épisodes font 496 à 605 vues. Même titre, même mise en scène, jour fixe."], ["Repenser les Reels recettes", "Les raviolis (257 vues) et les tortellini (185 vues) sont en bas du classement. Les recettes marchent mieux en dégustation avec quelqu'un de l'équipe, comme le croustillant du traiteur (990 vues)."], ["Montrer des gens plutôt que des produits", "Les nouveautés présentées seules (Yumi, Celsius) restent autour de 300 vues ; les baguettes goûtées par des clients en font 481, avec 20 s de visionnage."], ["Ne pas couper le rythme", "Vise 3 à 4 publications par semaine, programmées à l'avance, pour éviter un nouveau creux comme du 13 au 20 octobre, où il n'y a eu que 5 nouveaux abonnés en 8 jours."], ["Publier en soirée", "Tes abonnés sont le plus connectés entre 19 h et 22 h (jusqu'à 65 en ligne à 21 h), avec un second pic vers 13 h. Programme les Reels vers 18 h 30 - 19 h."], ["Encourager les partages et les enregistrements", "70 des 96 partages viennent de trois Reels. Demande à l'équipe de repartager en story à chaque fois, et ajoute « Enregistre pour ta prochaine liste de courses » aux paniers : il n'y a que 6 enregistrements en tout."]], "months": [{"month": "2026-09", "status": "reference", "through": "2026-09-30", "actual": {"posts": 13, "views": 6160, "engaged": 244, "followers": 205, "watch": 10.9, "reels": 10, "topReel": 1281}, "goals": null}, {"month": "2026-10", "status": "in_progress", "through": "2026-10-28", "actual": {"posts": 11, "views": 9907, "engaged": 345, "followers": 236, "watch": 14.4, "reels": 10, "topReel": 1100}, "goals": {"posts": 18, "views": 8530, "topReel": 1820, "followers": 272, "watch": 15}}], "plan": {"start": {"month": "2026-09", "followers": 205, "views": 6160, "engaged": 244, "watch": 10.9, "topReel": 1281}, "target": {"month": "2027-04", "followers": 1500, "views": 60000, "engaged": 1000, "postsPerWeek": 4, "watch": 20, "topReel": 15000}, "months": {"2026-10": {"posts": 18, "views": 8530, "engaged": 298, "followers": 272, "watch": 15, "topReel": 1820}, "2026-11": {"posts": 17, "views": 11800, "engaged": 365, "followers": 362, "watch": 16, "topReel": 2590}, "2026-12": {"posts": 18, "views": 16340, "engaged": 447, "followers": 481, "watch": 17, "topReel": 3680}, "2027-01": {"posts": 18, "views": 22620, "engaged": 546, "followers": 639, "watch": 18, "topReel": 5230}, "2027-02": {"posts": 16, "views": 31310, "engaged": 668, "followers": 849, "watch": 19, "topReel": 7430}, "2027-03": {"posts": 18, "views": 43340, "engaged": 817, "followers": 1129, "watch": 20, "topReel": 10550}, "2027-04": {"posts": 17, "views": 60000, "engaged": 1000, "followers": 1500, "watch": 20, "topReel": 15000}}, "why": "Le plan part de fin septembre, au début du travail sur le compte : environ 900 clients du quartier et 600 abonnés d'ailleurs d'ici avril 2027, chaque mois au moins un Reel qui perce bien au-delà des abonnés, et des Reels regardés 20 s en moyenne."}}]}</script>
+<main class="wrap" id="planning" hidden>
+  <p class="empty" id="pl-empty" hidden></p>
+  <div id="pl-body">
+    <div class="pl-top">
+      <div class="pl-title"><h1 id="pl-title">Planning</h1><select id="pl-cm" aria-label="Community manager" hidden></select></div>
+      <div class="week-nav">
+        <button type="button" id="wk-prev" aria-label="Semaine précédente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <div class="wk-mid"><b id="wk-label"></b><small id="wk-sub"></small></div>
+        <button type="button" id="wk-next" aria-label="Semaine suivante"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+    <section class="kpis3" id="pl-tot" aria-label="Totaux des shifts"></section>
+    <section class="pl-props" id="pl-props" hidden></section>
+    <section class="days" id="pl-days"></section>
+    <p class="note" id="pl-foot"></p>
+  </div>
+  <button type="button" class="fab" id="pl-add">Ajouter un shift</button>
+</main>
+
+<nav class="tabbar" aria-label="Sections">
+  <button type="button" data-tab="stats" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V11M10 20V4M16 20v-7M21 20H3"/></svg><span>Statistiques</span></button>
+  <button type="button" data-tab="planning"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Planning</span><i class="badge" id="tab-badge" hidden></i></button>
+</nav>
+</div>
+
+<dialog class="sheet" id="sheet">
+  <form method="dialog" id="sheet-form">
+    <h2 id="sheet-title"></h2>
+    <p class="note" id="sheet-sub" hidden></p>
+    <div id="sheet-fields"></div>
+    <p class="form-err" id="sheet-err" hidden></p>
+    <div class="sheet-btns">
+      <button type="button" class="btn ghost" id="sheet-cancel">Annuler</button>
+      <button type="button" class="btn danger" id="sheet-del" hidden>Supprimer</button>
+      <button type="submit" class="btn" id="sheet-ok">Enregistrer</button>
+    </div>
+  </form>
+</dialog>
+
+<section class="auth" id="auth" hidden>
+  <div class="auth-in">
+    <img src="/assets/icon-192.png" alt="" width="84" height="84" class="auth-logo">
+    <h1>Mes Réseaux</h1>
+    <p class="note">Statistiques et planning des magasins</p>
+    <div class="seg" role="group" aria-label="Type de connexion">
+      <button type="button" data-mode="login" aria-pressed="true">Se connecter</button>
+      <button type="button" data-mode="register" aria-pressed="false">Première connexion</button>
+    </div>
+    <form id="auth-form" novalidate>
+      <label id="f-invite" hidden><span>Code d'invitation</span><input name="invite" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Reçu de la direction"></label>
+      <label><span>Prénom</span><input name="firstName" autocomplete="username" autocapitalize="words" required></label>
+      <label><span id="f-code-lbl">Code personnel</span><input name="code" type="password" autocomplete="current-password" required></label>
+      <label id="f-code2" hidden><span>Confirme ton code</span><input name="code2" type="password" autocomplete="new-password"></label>
+      <p class="form-err" id="auth-err" hidden></p>
+      <button type="submit" class="btn big" id="auth-ok">Se connecter</button>
+      <p class="note" id="auth-help">Tu restes connecté sur ce téléphone.</p>
+    </form>
+  </div>
+</section>
+
 <script>
-(() => {
-  const DATA = JSON.parse(document.getElementById('data').textContent);
+// The statistics dashboard. Started by the app script once the user is signed in and the data has loaded.
+window.startDashboard = (DATA) => {
   const $ = (s) => document.querySelector(s);
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const NS = 'http://www.w3.org/2000/svg';
@@ -897,7 +1067,7 @@ footer { margin-top: 10px; }
   if (!DATA.stores.some((s) => s.id === start)) start = DATA.stores[0].id;
   render(start);
   window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (DATA.stores.some((s) => s.id === h) && h !== current.id) render(h); });
-})();
+};
 </script>
 <script>
 // Weekly push notification: register the service worker, subscribe on demand, store the subscription server-side.
@@ -965,6 +1135,314 @@ footer { margin-top: 10px; }
   });
   if (mq.addEventListener) mq.addEventListener('change', sync);
   sync();
+})();
+</script>
+<script>
+// App shell: sign-in, greeting, account menu, tabs, and the community manager's planning (timesheet).
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const api = async (path, body) => {
+    const r = await fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.ok === false) throw Object.assign(new Error(j.error || 'Erreur ' + r.status), { status: r.status });
+    return j;
+  };
+  const ROLE = { direction: 'Direction', cm: 'Community manager' };
+  let me = null;
+
+  // ---------- sign-in ----------
+  let mode = 'login';
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
+    const reg = m === 'register';
+    $('#f-invite').hidden = !reg; $('#f-code2').hidden = !reg;
+    $('#f-code-lbl').textContent = reg ? 'Choisis ton code personnel (6 caractères minimum)' : 'Code personnel';
+    $('#auth-form').code.autocomplete = reg ? 'new-password' : 'current-password';
+    $('#auth-ok').textContent = reg ? 'Créer mon compte' : 'Se connecter';
+    $('#auth-help').textContent = reg ? 'Le code d\'invitation t\'a été donné par la direction. Il indique si tu es de la direction ou community manager.' : 'Tu restes connecté sur ce téléphone.';
+    $('#auth-err').hidden = true;
+  }
+  function showAuth(message) {
+    document.body.classList.remove('signed');
+    $('#app').hidden = true; $('#auth').hidden = false;
+    if (message) { $('#auth-err').textContent = message; $('#auth-err').hidden = false; }
+  }
+  document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
+  $('#auth-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target, err = $('#auth-err'), ok = $('#auth-ok');
+    const body = { action: mode, firstName: f.firstName.value, code: f.code.value };
+    err.hidden = true;
+    if (!body.firstName.trim()) { err.textContent = 'Indique ton prénom.'; err.hidden = false; return; }
+    if (mode === 'register') {
+      body.invite = f.invite.value;
+      if (!body.invite.trim()) { err.textContent = 'Entre le code d\'invitation.'; err.hidden = false; return; }
+      if (body.code.length < 6) { err.textContent = 'Ton code doit faire au moins 6 caractères.'; err.hidden = false; return; }
+      if (body.code !== f.code2.value) { err.textContent = 'Les deux codes ne sont pas identiques.'; err.hidden = false; return; }
+    }
+    ok.disabled = true;
+    try { await api('/api/auth', body); location.reload(); }
+    catch (x) { err.textContent = x.status === 503 ? 'Le serveur n\'est pas encore configuré.' : x.message; err.hidden = false; ok.disabled = false; }
+  });
+
+  // ---------- account menu ----------
+  const menu = $('#menu');
+  document.addEventListener('click', (e) => { if (menu.open && !menu.contains(e.target)) menu.open = false; });
+  menu.querySelectorAll('[data-act]').forEach((b) => b.addEventListener('click', async () => {
+    menu.open = false;
+    const act = b.dataset.act;
+    if (act === 'logout') { try { await api('/api/auth', { action: 'logout' }); } catch (e) {} location.reload(); }
+    if (act === 'code') openSheet({
+      title: 'Changer mon code',
+      fields: [['oldCode', 'Code actuel', 'password'], ['code', 'Nouveau code (6 caractères minimum)', 'password'], ['code2', 'Confirme le nouveau code', 'password']],
+      submit: async (v) => { if (v.code !== v.code2) throw new Error('Les deux codes ne sont pas identiques.'); await api('/api/users', { action: 'change', oldCode: v.oldCode, code: v.code }); toast('Code modifié.'); },
+    });
+    if (act === 'reset') {
+      const { users } = await api('/api/users');
+      const others = users.filter((u) => u.id !== me.id);
+      if (!others.length) { toast('Aucun autre compte pour l\'instant.'); return; }
+      openSheet({
+        title: 'Réinitialiser un code',
+        sub: 'Choisis le compte et donne-lui un nouveau code provisoire. La personne pourra le changer ensuite dans son menu.',
+        fields: [['user', 'Compte', 'select', others.map((u) => [u.id, u.firstName + ' · ' + ROLE[u.role]])], ['code', 'Nouveau code (6 caractères minimum)', 'text']],
+        submit: async (v) => { await api('/api/users', { action: 'reset', userId: v.user, code: v.code }); toast('Code réinitialisé.'); },
+      });
+    }
+    if (act === 'invites') openSheet({
+      title: 'Codes d\'invitation',
+      sub: 'Pour créer un compte, la personne choisit « Première connexion » et entre l\'un de ces codes. Contacte la personne qui gère l\'appli pour les obtenir ou les changer.',
+      fields: [], okLabel: 'Fermer', submit: async () => {},
+    });
+  }));
+
+  // ---------- bottom sheet form ----------
+  const sheet = $('#sheet');
+  let sheetCfg = null;
+  function openSheet(cfg) {
+    sheetCfg = cfg;
+    $('#sheet-title').textContent = cfg.title;
+    $('#sheet-sub').hidden = !cfg.sub; $('#sheet-sub').textContent = cfg.sub || '';
+    $('#sheet-err').hidden = true;
+    $('#sheet-del').hidden = !cfg.remove;
+    $('#sheet-ok').textContent = cfg.okLabel || 'Enregistrer';
+    $('#sheet-ok').className = 'btn' + (cfg.okClass ? ' ' + cfg.okClass : '');
+    const box = $('#sheet-fields'); box.replaceChildren();
+    const fieldEl = ([name, label, type, opts, value]) => {
+      const l = el('label', 'fld'); l.append(el('span', '', label));
+      let inp;
+      if (type === 'select') { inp = el('select'); opts.forEach(([v, t]) => { const o = el('option', '', t); o.value = v; inp.append(o); }); }
+      else if (type === 'textarea') inp = el('textarea');
+      else { inp = el('input'); inp.type = type; if (type === 'password') inp.autocomplete = 'off'; }
+      inp.name = name; if (value != null) inp.value = value;
+      l.append(inp); return l;
+    };
+    (cfg.fields || []).forEach((f) => {
+      if (Array.isArray(f[0])) { const row = el('div', 'row2'); f.forEach((g) => row.append(fieldEl(g))); box.append(row); }
+      else box.append(fieldEl(f));
+    });
+    sheet.showModal();
+    const first = box.querySelector('input, textarea, select'); if (first && !cfg.noFocus) first.focus();
+  }
+  const sheetValues = () => Object.fromEntries([...$('#sheet-fields').querySelectorAll('[name]')].map((i) => [i.name, i.value]));
+  async function runSheet(fn) {
+    const ok = $('#sheet-ok'), del = $('#sheet-del');
+    ok.disabled = del.disabled = true; $('#sheet-err').hidden = true;
+    try { await fn(sheetValues()); sheet.close(); }
+    catch (x) { $('#sheet-err').textContent = x.message; $('#sheet-err').hidden = false; }
+    ok.disabled = del.disabled = false;
+  }
+  $('#sheet-form').addEventListener('submit', (e) => { e.preventDefault(); runSheet(sheetCfg.submit); });
+  $('#sheet-del').addEventListener('click', () => runSheet(sheetCfg.remove));
+  $('#sheet-cancel').addEventListener('click', () => sheet.close());
+  sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.close(); });
+
+  let toastTimer;
+  function toast(text) {
+    let t = $('#toast');
+    if (!t) { t = el('div', 'toast'); t.id = 'toast'; t.setAttribute('role', 'status'); document.body.append(t); }
+    t.textContent = text; t.classList.add('on');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 2600);
+  }
+
+  // ---------- tabs ----------
+  function setTab(tab) {
+    document.body.dataset.tab = tab;
+    $('#stats').hidden = tab !== 'stats'; $('#planning').hidden = tab !== 'planning';
+    document.querySelectorAll('.tabbar button').forEach((b) => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+    window.scrollTo(0, 0);
+    if (tab === 'planning') loadWeek();
+  }
+  document.querySelectorAll('.tabbar button').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
+
+  // ---------- planning ----------
+  const DAY = 864e5;
+  const D = (s) => new Date(s + 'T12:00:00Z');
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const addDays = (s, n) => iso(new Date(D(s).getTime() + n * DAY));
+  const mondayOf = (s) => addDays(s, -((D(s).getUTCDay() + 6) % 7));
+  const fmt = (o) => new Intl.DateTimeFormat('fr-FR', { ...o, timeZone: 'UTC' });
+  const fDay = fmt({ weekday: 'long', day: 'numeric', month: 'short' }), fShort = fmt({ day: 'numeric', month: 'short' }), fMonth = fmt({ month: 'long' });
+  const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+  const mins = (s) => { const [a, b] = s.start.split(':').map(Number), [c, d] = s.end.split(':').map(Number); return c * 60 + d - (a * 60 + b); };
+  const hm = (m) => Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + String(m % 60).padStart(2, '0') : '');
+  const hhmm = (t) => t.replace(':', ' h ');
+
+  const P = { week: null, cm: null, today: null, data: null, cms: [] };
+  async function loadWeek() {
+    if (!P.week) P.week = mondayOf(P.today || iso(new Date()));
+    const mid = addDays(P.week, 3); // the week's Thursday decides which month it belongs to
+    const mStart = mid.slice(0, 8) + '01', mEnd = iso(new Date(Date.UTC(+mid.slice(0, 4), +mid.slice(5, 7), 0, 12)));
+    const from = P.week < mStart ? P.week : mStart, to = addDays(P.week, 6) > mEnd ? addDays(P.week, 6) : mEnd;
+    try {
+      const q = new URLSearchParams({ from, to }); if (P.cm) q.set('cm', P.cm);
+      const r = await api('/api/shifts?' + q);
+      P.today = r.today; P.cm = r.cm.id; P.cms = r.cms; P.data = { ...r, mid, mStart, mEnd };
+      if (!P.weekSet) { P.weekSet = true; if (P.week !== mondayOf(r.today)) { P.week = mondayOf(r.today); return loadWeek(); } }
+      $('#pl-empty').hidden = true; $('#pl-body').hidden = false; $('#pl-add').hidden = false;
+      renderWeek();
+    } catch (x) {
+      $('#pl-body').hidden = true; $('#pl-add').hidden = true;
+      $('#pl-empty').textContent = x.status === 404 && me.role === 'direction'
+        ? 'Aucun community manager n\'a encore créé son compte. Donne-lui le code d\'invitation « community manager » : il choisit « Première connexion » dans l\'appli.'
+        : 'Impossible de charger le planning : ' + x.message;
+      $('#pl-empty').hidden = false;
+    }
+  }
+  const isCm = () => me.role === 'cm';
+  const locked = (date) => isCm() && P.today > addDays(mondayOf(date), 6);
+
+  function shiftCard(s) {
+    const own = isCm();
+    const canEdit = own ? s.status === 'confirmed' && !locked(s.date) : true;
+    const card = el(canEdit ? 'button' : 'div', 'shift ' + s.status);
+    if (canEdit) { card.type = 'button'; card.addEventListener('click', () => editShift(s)); }
+    const top = el('div', 'sh-top'); top.append(el('span', 'sh-time', hhmm(s.start) + ' – ' + hhmm(s.end)), el('span', 'sh-dur', hm(mins(s))));
+    card.append(top);
+    if (s.status === 'proposed') card.append(el('span', 'sh-tag', own ? 'Proposé par la direction' : 'En attente de ' + (P.data.cm.firstName)));
+    if (s.status === 'declined') card.append(el('span', 'sh-tag', 'Refusé' + (s.reason ? ' : « ' + s.reason + ' »' : '')));
+    card.append(el('div', 'sh-note' + (s.note ? '' : ' muted'), s.note || (own ? 'Ajoute ce que tu as fait' : 'Rien de noté')));
+    if (own && s.status === 'proposed') {
+      const acts = el('div', 'sh-acts');
+      const yes = el('button', 'btn ok', 'Accepter'), no = el('button', 'btn danger', 'Refuser');
+      yes.type = no.type = 'button';
+      yes.addEventListener('click', async () => { yes.disabled = no.disabled = true; try { await api('/api/shifts', { action: 'respond', id: s.id, accept: true }); toast('Shift accepté.'); loadWeek(); } catch (x) { toast(x.message); yes.disabled = no.disabled = false; } });
+      no.addEventListener('click', () => openSheet({
+        title: 'Refuser ce shift', sub: cap(fDay.format(D(s.date))) + ', ' + hhmm(s.start) + ' – ' + hhmm(s.end),
+        fields: [['reason', 'Motif (facultatif)', 'textarea']], okLabel: 'Refuser', okClass: 'danger',
+        submit: async (v) => { await api('/api/shifts', { action: 'respond', id: s.id, accept: false, reason: v.reason }); toast('Shift refusé.'); loadWeek(); },
+      }));
+      acts.append(yes, no); card.append(acts);
+    }
+    return card;
+  }
+
+  function renderWeek() {
+    const { shifts, proposals, cm, mid, mStart, mEnd } = P.data;
+    const wEnd = addDays(P.week, 6);
+    const own = isCm();
+    $('#pl-title').textContent = own ? 'Mon planning' : 'Planning de ' + cm.firstName;
+    const sel = $('#pl-cm');
+    sel.hidden = own || P.cms.length < 2;
+    if (!sel.hidden) { sel.replaceChildren(...P.cms.map((u) => { const o = el('option', '', u.firstName); o.value = u.id; o.selected = u.id === cm.id; return o; })); }
+    const thisWeek = P.week === mondayOf(P.today);
+    $('#wk-label').textContent = thisWeek ? 'Cette semaine' : 'Semaine du ' + fShort.format(D(P.week));
+    $('#wk-sub').textContent = 'Du ' + fShort.format(D(P.week)) + ' au ' + fShort.format(D(wEnd)) + (locked(P.week) ? ' · verrouillée' : '');
+
+    const conf = (s) => s.status === 'confirmed';
+    const inWeek = shifts.filter((s) => s.date >= P.week && s.date <= wEnd);
+    const wMin = inWeek.filter(conf).reduce((a, s) => a + mins(s), 0);
+    const mMin = shifts.filter((s) => conf(s) && s.date >= mStart && s.date <= mEnd).reduce((a, s) => a + mins(s), 0);
+    const tile = (l, v, sub) => { const k = el('div', 'k3'); k.append(el('div', 'l', l), el('div', 'v', v), el('div', 's', sub)); return k; };
+    $('#pl-tot').replaceChildren(
+      tile('Semaine', hm(wMin), inWeek.filter(conf).length + ' shift' + (inWeek.filter(conf).length > 1 ? 's' : '')),
+      tile(cap(fMonth.format(D(mid))), hm(mMin), 'au total'),
+      tile('En attente', String(proposals.length), proposals.length > 1 ? 'propositions' : 'proposition'),
+    );
+
+    // proposals waiting for an answer, whatever their week
+    const props = $('#pl-props');
+    const elsewhere = proposals.filter((s) => s.date < P.week || s.date > wEnd);
+    props.hidden = !elsewhere.length;
+    if (elsewhere.length) {
+      props.replaceChildren(el('h2', '', own ? 'Shifts proposés à valider' : 'Propositions en attente de ' + cm.firstName));
+      elsewhere.forEach((s) => { const w = el('div'); w.append(el('small', 'note', cap(fDay.format(D(s.date)))), shiftCard(s)); props.append(w); });
+    }
+
+    $('#pl-days').replaceChildren(...[0, 1, 2, 3, 4, 5, 6].map((i) => {
+      const date = addDays(P.week, i);
+      const list = inWeek.filter((s) => s.date === date);
+      const day = el('section', 'day' + (date === P.today ? ' today' : ''));
+      const h = el('div', 'day-h'); const tot = list.filter(conf).reduce((a, s) => a + mins(s), 0);
+      h.append(el('b', '', cap(fDay.format(D(date))) + (date === P.today ? ' · aujourd\'hui' : '')), el('small', '', tot ? hm(tot) : ''));
+      day.append(h);
+      if (list.length) list.forEach((s) => day.append(shiftCard(s)));
+      else day.append(el('p', 'day-empty', 'Aucun shift'));
+      return day;
+    }));
+
+    const add = $('#pl-add');
+    add.textContent = own ? '+ Ajouter un shift' : '+ Proposer un shift';
+    add.disabled = own && locked(wEnd);
+    $('#pl-foot').textContent = own
+      ? (locked(wEnd) ? 'Cette semaine est verrouillée depuis dimanche 23 h 59. Seule la direction peut encore la modifier.' : 'Tu peux modifier cette semaine jusqu\'à dimanche 23 h 59.')
+      : 'Les shifts que tu proposes attendent la réponse de ' + cm.firstName + '. Tu peux modifier ou supprimer n\'importe quel shift, à tout moment.';
+    const badge = $('#tab-badge');
+    badge.hidden = !own || !proposals.length; badge.textContent = proposals.length;
+  }
+
+  function shiftFields(s, date) {
+    return [
+      ['date', 'Date', 'date', null, s ? s.date : date],
+      [['start', 'Début', 'time', null, s ? s.start : '09:00'], ['end', 'Fin', 'time', null, s ? s.end : '12:00']],
+      ['note', isCm() ? 'Ce que tu as fait' : (s && s.status === 'confirmed' ? 'Ce qui a été fait' : 'Ce qu\'il faut faire'), 'textarea', null, s ? s.note : ''],
+    ];
+  }
+  function editShift(s) {
+    openSheet({
+      title: isCm() ? 'Modifier le shift' : 'Modifier le shift de ' + P.data.cm.firstName,
+      sub: !isCm() && s.status === 'declined' ? 'Ce shift a été refusé. En l\'enregistrant, tu le proposes à nouveau.' : null,
+      fields: shiftFields(s), noFocus: true,
+      submit: async (v) => { await api('/api/shifts', { action: 'save', cm: P.cm, id: s.id, ...v }); toast('Shift enregistré.'); loadWeek(); },
+      remove: async () => { if (!confirm('Supprimer ce shift ?')) throw new Error('Suppression annulée.'); await api('/api/shifts', { action: 'delete', cm: P.cm, id: s.id }); toast('Shift supprimé.'); loadWeek(); },
+    });
+  }
+  $('#pl-add').addEventListener('click', () => {
+    const today = P.today, wEnd = addDays(P.week, 6);
+    const date = today >= P.week && today <= wEnd ? today : P.week;
+    openSheet({
+      title: isCm() ? 'Nouveau shift' : 'Proposer un shift à ' + P.data.cm.firstName,
+      sub: isCm() ? null : P.data.cm.firstName + ' recevra une notification pour l\'accepter ou le refuser.',
+      fields: shiftFields(null, date), noFocus: true,
+      okLabel: isCm() ? 'Enregistrer' : 'Proposer',
+      submit: async (v) => { await api('/api/shifts', { action: 'save', cm: P.cm, ...v }); toast(isCm() ? 'Shift enregistré.' : 'Shift proposé.'); P.week = mondayOf(v.date); loadWeek(); },
+    });
+  });
+  $('#wk-prev').addEventListener('click', () => { P.week = addDays(P.week, -7); loadWeek(); });
+  $('#wk-next').addEventListener('click', () => { P.week = addDays(P.week, 7); loadWeek(); });
+  $('#pl-cm').addEventListener('change', (e) => { P.cm = e.target.value; loadWeek(); });
+
+  // ---------- start ----------
+  (async () => {
+    try { me = (await api('/api/auth')).user; }
+    catch (x) { setMode('login'); showAuth(x.status === 401 ? null : x.status === 503 ? 'Le serveur n\'est pas encore configuré.' : 'Connexion impossible pour l\'instant. Réessaie dans un moment.'); return; }
+    document.body.classList.add('signed');
+    $('#auth').hidden = true; $('#app').hidden = false;
+    $('#hello').textContent = 'Bonjour ' + me.firstName;
+    $('#avatar').textContent = me.firstName.charAt(0).toUpperCase();
+    $('#menu-name').textContent = me.firstName; $('#menu-role').textContent = ROLE[me.role];
+    $('#menu-reset').hidden = $('#menu-invites').hidden = me.role !== 'direction';
+    $('.tabbar [data-tab="planning"] span').textContent = isCm() ? 'Mon planning' : 'Planning';
+    const deep = location.hash === '#planning';
+    // a shift notification opens the app on /#planning, even when it is already open
+    window.addEventListener('hashchange', () => { if (location.hash === '#planning') setTab('planning'); });
+    setTab(deep ? 'planning' : 'stats');
+    try { window.startDashboard(await api('/api/data')); }
+    catch (x) { $('#stats').prepend(el('p', 'empty', 'Impossible de charger les statistiques : ' + x.message)); }
+    // the CM sees waiting proposals on the tab badge even before opening the planning
+    if (isCm() && !deep) loadWeek();
+  })();
 })();
 </script>
 </body>
