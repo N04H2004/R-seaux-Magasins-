@@ -332,6 +332,7 @@ button.shift { cursor: pointer; }
 .sh-dur { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
 .sh-note { font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .sh-note.muted { color: var(--muted); font-style: italic; }
+.sh-by { font-size: 12px; color: var(--muted); }
 .sh-tag { align-self: flex-start; font: 600 12px/1 var(--font-body); padding: 4px 8px; border-radius: 999px; background: var(--grid); color: var(--muted); }
 .shift.proposed .sh-tag { background: var(--surface); color: var(--accent-ink); }
 .shift.declined .sh-tag { background: color-mix(in srgb, var(--bad) 12%, transparent); color: var(--bad); }
@@ -1323,6 +1324,11 @@ window.startDashboard = (DATA) => {
     if (s.status === 'proposed') card.append(el('span', 'sh-tag', own ? 'Proposé par la direction' : 'En attente de ' + (P.data.cm.firstName)));
     if (s.status === 'declined') card.append(el('span', 'sh-tag', 'Refusé' + (s.reason ? ' : « ' + s.reason + ' »' : '')));
     card.append(el('div', 'sh-note' + (s.note ? '' : ' muted'), s.note || (own ? 'Ajoute ce que tu as fait' : 'Rien de noté')));
+    // who put this shift in the timesheet: the CM themself, or the direction (then accepted by the CM)
+    const cmName = P.data.cm.firstName, byDirection = s.createdBy && s.createdBy !== s.cm;
+    let by = byDirection ? 'Ajouté par la direction' + (s.status === 'confirmed' ? ' · accepté par ' + cmName : '') : 'Ajouté par ' + cmName;
+    if (s.updatedBy && s.updatedBy !== s.cm && !(byDirection && s.updatedBy === s.createdBy && s.status !== 'confirmed')) by += ' · modifié par la direction';
+    card.append(el('small', 'sh-by', by));
     if (own && s.status === 'proposed') {
       const acts = el('div', 'sh-acts');
       const yes = el('button', 'btn ok', 'Accepter'), no = el('button', 'btn danger', 'Refuser');
