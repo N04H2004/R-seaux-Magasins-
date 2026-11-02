@@ -1,0 +1,36 @@
+# When the weekly update pushes a new data.json, wait for Vercel to put it online,
+# then ask the app to send the notification to every subscribed phone.
+name: Notification des nouvelles données
+
+on:
+  push:
+    branches: [claude/exciting-darwin-jm5s48]
+    paths: [data.json]
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Attendre la mise en ligne, puis notifier
+        env:
+          SITE: https://reseaux-magasins.vercel.app
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          want=$(jq -r .updated data.json)
+          auth=()
+          if [ -n "$CRON_SECRET" ]; then auth=(-H "Authorization: Bearer $CRON_SECRET"); fi
+          for i in $(seq 1 40); do
+            got=$(curl -fsS "$SITE/api/version" | jq -r .updated || true)
+            if [ "$got" = "$want" ]; then
+              curl -fsS "${auth[@]}" "$SITE/api/notify"
+              echo
+              exit 0
+            fi
+            echo "En ligne : ${got:-?}, attendu : $want (essai $i/40)"
+            sleep 15
+          done
+          echo "La version du $want n'est pas en ligne après 10 minutes."
+          exit 1
