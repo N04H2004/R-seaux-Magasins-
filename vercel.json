@@ -8,6 +8,6 @@
     { "source": "/", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] }
   ],
   "crons": [
-    { "path": "/api/notify", "schedule": "0 8 * * 1" }
+    { "path": "/api/notify", "schedule": "0 8 * * *" }
   ]
 }
