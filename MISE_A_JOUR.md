@@ -15,7 +15,7 @@ Le site (statistiques Instagram de deux magasins à Nice) est hébergé sur Verc
    - `daily` : une ligne par jour de la fenêtre avec `date`, `followers` (nouveaux abonnés du jour, `null` si Instagram ne le fournit pas, c'est le cas sous 100 abonnés), `reach`, `views`, `engaged` (comptes ayant interagi) ;
    - `compare` : totaux `views`/`engaged` sur la fenêtre et `viewsPrev`/`engagedPrev` sur la période précédente ;
    - `posts` : les publications du fil (Reel, Photo, Carrousel), triées par vues décroissantes, avec `id`, `time` (« AAAA-MM-JJ HH:MM », heure de Paris), `format`, `title` (titre court en français tiré de la légende ; « Photo sans légende (JJ mois) » s'il n'y en a pas), `views`, `reach`, `interactions`, `likes`, `comments`, `saves`, `shares`, `link`, `watch` (temps de visionnage moyen en secondes, Reels seulement, sinon null) et `skip` (taux de passage en %, Reels seulement, sinon null). Publications des 2 derniers mois environ ;
-   - `audience` : `hours` (24 valeurs, abonnés en ligne par heure, heure de Paris), `ages` ([tranche, nombre]), `cities` (8 premières [ville, nombre]), ou `null` si Instagram ne les fournit pas (moins de 100 abonnés).
+   - `audience` : `hours` (24 valeurs, abonnés en ligne par heure, heure de Paris), `ages` ([tranche, nombre]), `cities` (8 premières [ville, nombre]), ou `null` si Instagram ne les fournit pas (moins de 100 abonnés). Ces données sont secondaires : si l'une des trois revient vide alors que le compte a plus de 100 abonnés, garde la valeur actuelle de `data.json` pour celle-là (ou `null` s'il n'y en a pas) et continue. Ne t'arrête jamais pour l'audience.
    Garde inchangés `id`, `name`, `handle`, `place`, `brand` de chaque magasin, et `source`.
 4. Mets à jour `updated` (date du jour) et `period` (`start`/`end`).
 4bis. Mets à jour la **note du mois** de chaque magasin (tableau `months`, voir la section « Note du mois » plus bas).
@@ -53,6 +53,8 @@ Ne change pas ces règles toi-même. Si l'utilisateur a demandé d'autres object
 Contexte pour les recommandations : à Intermarché Cessole, un QR code Instagram est déjà affiché en caisse. Ne le recommande pas comme une nouveauté (tu peux proposer de le rendre plus visible ou de l'animer).
 
 ## En cas de problème
-Si le connecteur Supermetrics n'est pas disponible, demande une reconnexion, ou si un compte ne renvoie aucune donnée : ne pousse rien de partiel ou d'inventé. Arrête-toi et explique clairement ce qui bloque et comment le corriger.
+Arrête-toi sans rien pousser seulement si une donnée **principale** manque : le connecteur Supermetrics n'est pas disponible ou demande une reconnexion, ou un compte ne renvoie pas ses chiffres journaliers (`daily`), ses totaux (`compare`, `months`), son nombre d'abonnés ou ses publications. N'invente jamais un chiffre. Explique alors clairement ce qui bloque et comment le corriger.
+
+Une donnée **secondaire** manquante (âges, villes ou heures de l'audience, temps de visionnage d'un Reel isolé) ne bloque pas la mise à jour : garde la valeur précédente comme indiqué plus haut, pousse le reste, et signale-le en une ligne dans ton résumé final.
 
 Termine par un résumé de 2-3 lignes : période couverte, vues et abonnés de chaque magasin, commit poussé.
