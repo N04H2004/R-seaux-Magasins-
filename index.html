@@ -375,6 +375,20 @@ button.shift { cursor: pointer; }
 #auth-help { text-align: center; }
 .toast { position: fixed; left: 50%; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 60; background: var(--ink); color: var(--bg); padding: 11px 16px; border-radius: 999px; font: 600 14px/1.2 var(--font-body); transition: opacity .2s, transform .2s; max-width: calc(100vw - 32px); }
 .toast.on { opacity: 1; transform: translate(-50%, 0); }
+.post-row { display: flex; flex-direction: column; gap: 8px; border-top: 1px dashed var(--line); padding-top: 10px; }
+.post-line { display: flex; align-items: center; gap: 10px; }
+.post-check { display: inline-flex; align-items: center; gap: 8px; flex: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+.post-check input { width: 22px; height: 22px; accent-color: var(--good); margin: 0; }
+.post-text { flex: 1; min-width: 0; font: 15px var(--font-body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; }
+.post-text:disabled, .post-check input:disabled { opacity: .6; }
+.post-state { flex: none; font-size: 13px; font-weight: 600; color: var(--muted); }
+.post-row.done .post-state { color: var(--good); }
+.post-what { flex: 1; min-width: 0; font-size: 14px; overflow-wrap: anywhere; }
+.post-what.muted { color: var(--muted); }
+.post-fb-btn { align-self: flex-start; padding: 8px 12px; font-size: 13px; }
+.post-fb { background: var(--accent-soft); border-radius: 10px; padding: 9px 12px; }
+.post-fb small { font-size: 12px; font-weight: 600; color: var(--accent-ink); }
+.post-fb p { margin: 2px 0 0; font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
@@ -1344,6 +1358,47 @@ window.startDashboard = (DATA) => {
     return card;
   }
 
+  // The day's post, under its shifts: the CM ticks it and says which post; the direction reads it and leaves feedback.
+  function postRow(date) {
+    const own = isCm(), d = (P.data.days || {})[date] || {}, lock = locked(date);
+    const box = el('div', 'post-row' + (d.posted ? ' done' : ''));
+    if (own) {
+      const line = el('label', 'post-check');
+      const cb = el('input'); cb.type = 'checkbox'; cb.checked = !!d.posted; cb.disabled = lock;
+      line.append(cb, el('span', '', 'J\'ai posté'));
+      const txt = el('input', 'post-text'); txt.type = 'text'; txt.placeholder = 'Quel post ? (ex. Reel panier apéro)'; txt.value = d.post || ''; txt.disabled = lock; txt.maxLength = 500;
+      txt.setAttribute('aria-label', 'Quel post, ' + fDay.format(D(date)));
+      const save = async (body) => {
+        try { const r = await api('/api/shifts', { action: 'day', cm: P.cm, date, ...body }); P.data.days = { ...(P.data.days || {}), [date]: r.day }; box.classList.toggle('done', !!r.day.posted); updatePostCount(); }
+        catch (x) { toast(x.message); }
+      };
+      cb.addEventListener('change', () => { if (cb.checked && !txt.value) txt.focus(); save({ posted: cb.checked, post: txt.value }); });
+      txt.addEventListener('change', () => { if (txt.value.trim() && !cb.checked) cb.checked = true; save({ posted: cb.checked, post: txt.value }); });
+      const row = el('div', 'post-line'); row.append(line, txt); box.append(row);
+    } else {
+      const row = el('div', 'post-line');
+      row.append(el('span', 'post-state', d.posted ? '✓ Posté' : 'Pas de post noté'), el('span', 'post-what' + (d.post ? '' : ' muted'), d.post || '—'));
+      box.append(row);
+      const b = el('button', 'btn ghost post-fb-btn', d.feedback ? 'Modifier le retour' : 'Ajouter un retour'); b.type = 'button';
+      b.addEventListener('click', () => openSheet({
+        title: 'Retour sur le post', sub: cap(fDay.format(D(date))) + (d.post ? ' · ' + d.post : ''),
+        fields: [['posted', 'Posté ce jour ?', 'select', [['1', 'Oui'], ['0', 'Non']], d.posted ? '1' : '0'], ['post', 'Quel post', 'text', null, d.post || ''], ['feedback', 'Ton retour pour ' + P.data.cm.firstName, 'textarea', null, d.feedback || '']],
+        submit: async (v) => { await api('/api/shifts', { action: 'day', cm: P.cm, date, posted: v.posted === '1', post: v.post, feedback: v.feedback }); toast('Retour enregistré.'); loadWeek(); },
+      }));
+      box.append(b);
+    }
+    if (d.feedback) {
+      const fb = el('div', 'post-fb');
+      fb.append(el('small', '', 'Retour de ' + (d.feedbackBy || 'la direction')), el('p', '', d.feedback));
+      box.append(fb);
+    }
+    return box;
+  }
+  function updatePostCount() {
+    const wEnd = addDays(P.week, 6), n = Object.values(P.data.days || {}).filter((d) => d.posted && d.date >= P.week && d.date <= wEnd).length;
+    const t = document.getElementById('pl-posts'); if (t) t.textContent = n + ' jour' + (n > 1 ? 's' : '') + ' avec post';
+  }
+
   function renderWeek() {
     const { shifts, proposals, cm, mid, mStart, mEnd } = P.data;
     const wEnd = addDays(P.week, 6);
@@ -1361,11 +1416,15 @@ window.startDashboard = (DATA) => {
     const wMin = inWeek.filter(conf).reduce((a, s) => a + mins(s), 0);
     const mMin = shifts.filter((s) => conf(s) && s.date >= mStart && s.date <= mEnd).reduce((a, s) => a + mins(s), 0);
     const tile = (l, v, sub) => { const k = el('div', 'k3'); k.append(el('div', 'l', l), el('div', 'v', v), el('div', 's', sub)); return k; };
+    const wPosts = Object.values(P.data.days || {}).filter((d) => d.posted && d.date >= P.week && d.date <= wEnd).length;
     $('#pl-tot').replaceChildren(
       tile('Semaine', hm(wMin), inWeek.filter(conf).length + ' shift' + (inWeek.filter(conf).length > 1 ? 's' : '')),
       tile(cap(fMonth.format(D(mid))), hm(mMin), 'au total'),
       tile('En attente', String(proposals.length), proposals.length > 1 ? 'propositions' : 'proposition'),
     );
+    // the week tile also counts the days with a post
+    const pc = el('span', '', wPosts + ' jour' + (wPosts > 1 ? 's' : '') + ' avec post'); pc.id = 'pl-posts';
+    $('#pl-tot .k3 .s').append(el('br'), pc);
 
     // proposals waiting for an answer, whatever their week
     const props = $('#pl-props');
@@ -1385,6 +1444,7 @@ window.startDashboard = (DATA) => {
       day.append(h);
       if (list.length) list.forEach((s) => day.append(shiftCard(s)));
       else day.append(el('p', 'day-empty', 'Aucun shift'));
+      day.append(postRow(date));
       return day;
     }));
 

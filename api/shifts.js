@@ -1,6 +1,7 @@
 // The community manager's timesheet.
 // GET ?cm=<id>&from=YYYY-MM-DD&to=YYYY-MM-DD → shifts in that range (a CM only ever sees their own).
-// POST {action}: 'save' (create or edit), 'delete', 'respond' (CM accepts or declines a shift the direction proposed).
+// POST {action}: 'save' (create or edit), 'delete', 'respond' (CM accepts or declines a shift the direction proposed),
+//   'day' (the day's post: the CM ticks that they posted and says which post; the direction leaves feedback on it).
 // Status: 'confirmed' (in the timesheet), 'proposed' (by the direction, waiting for the CM), 'declined'.
 // A CM can change a week until Sunday 23:59 Paris time; the direction can change anything at any time.
 const crypto = require('crypto');
@@ -46,7 +47,10 @@ module.exports = async (req, res) => {
       // proposals still waiting, whatever the week, so the CM always sees them
       const proposals = all.filter((s) => s.status === 'proposed').sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start));
       const cms = me.role === 'direction' ? (await allUsers()).filter((u) => u.role === 'cm').map(publicUser) : [publicUser(me)];
-      return res.json({ ok: true, cm: publicUser(cm), cms, shifts, proposals, today: parisNow().date });
+      const flat = (await redis('HGETALL', 'days:' + cm.id)) || [];
+      const days = {};
+      for (let i = 0; i < flat.length; i += 2) if (flat[i] >= from && flat[i] <= to) days[flat[i]] = JSON.parse(flat[i + 1]);
+      return res.json({ ok: true, cm: publicUser(cm), cms, shifts, proposals, days, today: parisNow().date });
     }
     if (req.method !== 'POST') throw err(405, 'Méthode non permise');
     const b = await jsonBody(req);
@@ -85,6 +89,28 @@ module.exports = async (req, res) => {
       if (isCm && (s.status === 'proposed' || weekLocked(s.date))) throw err(403, s.status === 'proposed' ? 'Refuse ce shift plutôt que de le supprimer' : 'Cette semaine est verrouillée depuis dimanche 23 h 59');
       await redis('HDEL', 'shifts:' + cm.id, s.id);
       return res.json({ ok: true });
+    }
+
+    if (b.action === 'day') {
+      const date = String(b.date || '');
+      if (!DATE.test(date) || isNaN(new Date(date + 'T12:00:00Z'))) throw err(400, 'Date invalide');
+      const raw = await redis('HGET', 'days:' + cm.id, date);
+      const d = raw ? JSON.parse(raw) : { date };
+      if (isCm && weekLocked(date)) throw err(403, 'Cette semaine est verrouillée depuis dimanche 23 h 59');
+      if ('posted' in b) d.posted = !!b.posted;
+      if ('post' in b) d.post = String(b.post || '').trim().slice(0, 500);
+      let newFeedback = false;
+      if ('feedback' in b) {
+        if (isCm) throw err(403, 'Seule la direction laisse un retour');
+        const fb = String(b.feedback || '').trim().slice(0, 1000);
+        newFeedback = !!fb && fb !== d.feedback;
+        if (fb) Object.assign(d, { feedback: fb, feedbackBy: me.firstName, feedbackAt: now });
+        else { delete d.feedback; delete d.feedbackBy; delete d.feedbackAt; }
+      }
+      d.updatedAt = now; d.updatedBy = me.id;
+      await redis('HSET', 'days:' + cm.id, date, JSON.stringify(d));
+      if (newFeedback) await notifyUsers([cm.id], { title: 'Retour sur ton post', body: me.firstName + ' (' + dLong.format(new Date(date + 'T12:00:00Z')) + ') : ' + d.feedback, url: '/#planning' });
+      return res.json({ ok: true, day: d });
     }
 
     if (b.action === 'respond') {
