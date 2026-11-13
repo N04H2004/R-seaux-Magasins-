@@ -417,6 +417,7 @@ button.shift { cursor: pointer; }
           <button type="button" data-act="code">Changer mon code</button>
           <button type="button" data-act="reset" id="menu-reset" hidden>Réinitialiser le code d'un compte</button>
           <button type="button" data-act="invites" id="menu-invites" hidden>Codes d'invitation</button>
+          <button type="button" data-act="remove" id="menu-remove" class="danger" hidden>Supprimer un compte</button>
           <button type="button" data-act="logout" class="danger">Se déconnecter</button>
         </div>
       </details>
@@ -1225,6 +1226,22 @@ window.startDashboard = (DATA) => {
         submit: async (v) => { await api('/api/users', { action: 'reset', userId: v.user, code: v.code }); toast('Code réinitialisé.'); },
       });
     }
+    if (act === 'remove') {
+      const { users } = await api('/api/users');
+      const others = users.filter((u) => u.id !== me.id);
+      if (!others.length) { toast('Aucun autre compte à supprimer.'); return; }
+      openSheet({
+        title: 'Supprimer un compte',
+        sub: 'La personne est déconnectée de tous ses appareils et ne peut plus se connecter. Son planning reste consultable par la direction, en lecture seule.',
+        fields: [['user', 'Compte', 'select', others.map((u) => [u.id, u.firstName + ' · ' + ROLE[u.role]])]],
+        okLabel: 'Supprimer', okClass: 'danger',
+        submit: async (v) => {
+          const u = others.find((x) => x.id === v.user);
+          if (!confirm('Supprimer définitivement le compte de ' + u.firstName + ' ?')) throw new Error('Suppression annulée.');
+          await api('/api/users', { action: 'remove', userId: v.user }); toast('Compte de ' + u.firstName + ' supprimé.'); P.cm = null; if (document.body.dataset.tab === 'planning') loadWeek();
+        },
+      });
+    }
     if (act === 'invites') openSheet({
       title: 'Codes d\'invitation',
       sub: 'Pour créer un compte, la personne choisit « Première connexion » et entre l\'un de ces codes. Contacte la personne qui gère l\'appli pour les obtenir ou les changer.',
@@ -1330,7 +1347,7 @@ window.startDashboard = (DATA) => {
 
   function shiftCard(s) {
     const own = isCm();
-    const canEdit = own ? s.status === 'confirmed' && !locked(s.date) : true;
+    const canEdit = own ? s.status === 'confirmed' && !locked(s.date) : !P.data.cm.removed;
     const card = el(canEdit ? 'button' : 'div', 'shift ' + s.status);
     if (canEdit) { card.type = 'button'; card.addEventListener('click', () => editShift(s)); }
     const top = el('div', 'sh-top'); top.append(el('span', 'sh-time', hhmm(s.start) + ' – ' + hhmm(s.end)), el('span', 'sh-dur', hm(mins(s))));
@@ -1379,7 +1396,7 @@ window.startDashboard = (DATA) => {
       const row = el('div', 'post-line');
       row.append(el('span', 'post-state', d.posted ? '✓ Posté' : 'Pas de post noté'), el('span', 'post-what' + (d.post ? '' : ' muted'), d.post || '—'));
       box.append(row);
-      const b = el('button', 'btn ghost post-fb-btn', d.feedback ? 'Modifier le retour' : 'Ajouter un retour'); b.type = 'button';
+      const b = el('button', 'btn ghost post-fb-btn', d.feedback ? 'Modifier le retour' : 'Ajouter un retour'); b.type = 'button'; b.hidden = !!P.data.cm.removed;
       b.addEventListener('click', () => openSheet({
         title: 'Retour sur le post', sub: cap(fDay.format(D(date))) + (d.post ? ' · ' + d.post : ''),
         fields: [['posted', 'Posté ce jour ?', 'select', [['1', 'Oui'], ['0', 'Non']], d.posted ? '1' : '0'], ['post', 'Quel post', 'text', null, d.post || ''], ['feedback', 'Ton retour pour ' + P.data.cm.firstName, 'textarea', null, d.feedback || '']],
@@ -1403,10 +1420,10 @@ window.startDashboard = (DATA) => {
     const { shifts, proposals, cm, mid, mStart, mEnd } = P.data;
     const wEnd = addDays(P.week, 6);
     const own = isCm();
-    $('#pl-title').textContent = own ? 'Mon planning' : 'Planning de ' + cm.firstName;
+    $('#pl-title').textContent = own ? 'Mon planning' : 'Planning de ' + cm.firstName + (cm.removed ? ' (ancien)' : '');
     const sel = $('#pl-cm');
     sel.hidden = own || P.cms.length < 2;
-    if (!sel.hidden) { sel.replaceChildren(...P.cms.map((u) => { const o = el('option', '', u.firstName); o.value = u.id; o.selected = u.id === cm.id; return o; })); }
+    if (!sel.hidden) { sel.replaceChildren(...P.cms.map((u) => { const o = el('option', '', u.firstName + (u.removed ? ' (ancien compte)' : '')); o.value = u.id; o.selected = u.id === cm.id; return o; })); }
     const thisWeek = P.week === mondayOf(P.today);
     $('#wk-label').textContent = thisWeek ? 'Cette semaine' : 'Semaine du ' + fShort.format(D(P.week));
     $('#wk-sub').textContent = 'Du ' + fShort.format(D(P.week)) + ' au ' + fShort.format(D(wEnd)) + (locked(P.week) ? ' · verrouillée' : '');
@@ -1451,8 +1468,10 @@ window.startDashboard = (DATA) => {
     const add = $('#pl-add');
     add.textContent = own ? '+ Ajouter un shift' : '+ Proposer un shift';
     add.disabled = own && locked(wEnd);
+    add.hidden = !own && !!cm.removed;
     $('#pl-foot').textContent = own
       ? (locked(wEnd) ? 'Cette semaine est verrouillée depuis dimanche 23 h 59. Seule la direction peut encore la modifier.' : 'Tu peux modifier cette semaine jusqu\'à dimanche 23 h 59.')
+      : cm.removed ? cm.firstName + ' n\'a plus de compte : son planning reste consultable, en lecture seule.'
       : 'Les shifts que tu proposes attendent la réponse de ' + cm.firstName + '. Tu peux modifier ou supprimer n\'importe quel shift, à tout moment.';
     const badge = $('#tab-badge');
     badge.hidden = !own || !proposals.length; badge.textContent = proposals.length;
@@ -1498,7 +1517,7 @@ window.startDashboard = (DATA) => {
     $('#hello').textContent = 'Bonjour ' + me.firstName;
     $('#avatar').textContent = me.firstName.charAt(0).toUpperCase();
     $('#menu-name').textContent = me.firstName; $('#menu-role').textContent = ROLE[me.role];
-    $('#menu-reset').hidden = $('#menu-invites').hidden = me.role !== 'direction';
+    $('#menu-reset').hidden = $('#menu-invites').hidden = $('#menu-remove').hidden = me.role !== 'direction';
     $('.tabbar [data-tab="planning"] span').textContent = isCm() ? 'Mon planning' : 'Planning';
     const deep = location.hash === '#planning';
     // a shift notification opens the app on /#planning, even when it is already open

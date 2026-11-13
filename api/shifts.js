@@ -20,7 +20,8 @@ const store = (s) => redis('HSET', 'shifts:' + s.cm, s.id, JSON.stringify(s));
 // Which CM the request is about: yourself if you are one; for the direction, the one asked for or the only one.
 async function targetCm(me, asked) {
   if (me.role === 'cm') return me;
-  const cms = (await allUsers()).filter((u) => u.role === 'cm');
+  // active CMs first, then removed ones, whose timesheet stays readable
+  const cms = (await allUsers()).filter((u) => u.role === 'cm').sort((a, b) => (!!a.removed - !!b.removed) || String(b.createdAt).localeCompare(String(a.createdAt)));
   const cm = asked ? cms.find((u) => u.id === asked) : cms[0];
   if (!cm) throw err(404, 'Aucun community manager inscrit pour l\'instant');
   return cm;
@@ -46,7 +47,7 @@ module.exports = async (req, res) => {
       const shifts = all.filter((s) => s.date >= from && s.date <= to).sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start));
       // proposals still waiting, whatever the week, so the CM always sees them
       const proposals = all.filter((s) => s.status === 'proposed').sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start));
-      const cms = me.role === 'direction' ? (await allUsers()).filter((u) => u.role === 'cm').map(publicUser) : [publicUser(me)];
+      const cms = me.role === 'direction' ? (await allUsers()).filter((u) => u.role === 'cm').sort((a, b) => (!!a.removed - !!b.removed) || String(b.createdAt).localeCompare(String(a.createdAt))).map(publicUser) : [publicUser(me)];
       const flat = (await redis('HGETALL', 'days:' + cm.id)) || [];
       const days = {};
       for (let i = 0; i < flat.length; i += 2) if (flat[i] >= from && flat[i] <= to) days[flat[i]] = JSON.parse(flat[i + 1]);
@@ -57,6 +58,7 @@ module.exports = async (req, res) => {
     const cm = await targetCm(me, b.cm);
     const isCm = me.role === 'cm';
     const now = new Date().toISOString();
+    if (cm.removed && b.action !== 'delete') throw err(403, cm.firstName + ' n\'a plus de compte : son planning est en lecture seule');
 
     if (b.action === 'save') {
       const f = readFields(b);

@@ -40,7 +40,7 @@ const sha = (s) => crypto.createHash('sha256').update(String(s)).digest('hex');
 // Invitation codes decide the role. Only their hashes live here; env vars can replace them.
 const INVITES = {
   direction: process.env.INVITE_DIRECTION ? sha(process.env.INVITE_DIRECTION.trim().toUpperCase()) : 'fecdbf68df4548a7b8625d937dac97d16b5f42ef9254129906e5e66cb3667fcb',
-  cm: process.env.INVITE_CM ? sha(process.env.INVITE_CM.trim().toUpperCase()) : '8c79e8e0c7589816c3d537a755cf62697789cbc9f8fc9481b8dc3851e31c5b33',
+  cm: process.env.INVITE_CM ? sha(process.env.INVITE_CM.trim().toUpperCase()) : 'ab5f9300d73797d61ca6e53127e21a5160f08e6f8592a1cb632d92d41a5aeaae',
 };
 function roleForInvite(code) {
   const h = sha(String(code || '').trim().toUpperCase());
@@ -69,7 +69,9 @@ async function allUsers() {
   const ids = (await redis('SMEMBERS', 'users')) || [];
   return (await Promise.all(ids.map(getUser))).filter(Boolean);
 }
-const publicUser = (u) => ({ id: u.id, firstName: u.firstName, role: u.role });
+const publicUser = (u) => ({ id: u.id, firstName: u.firstName, role: u.role, ...(u.removed ? { removed: true } : {}) });
+// A removed account keeps its record (so the old timesheet stays readable) but can no longer sign in.
+const activeUsers = async () => (await allUsers()).filter((u) => !u.removed);
 
 // ---------- sessions: a long-lived httpOnly cookie, so a phone stays signed in ----------
 const SESSION_DAYS = 365;
@@ -95,7 +97,8 @@ async function currentUser(req) {
   const id = await redis('GET', key);
   if (!id) return null;
   await redis('EXPIRE', key, SESSION_DAYS * 86400); // sliding: each visit pushes the expiry back
-  return getUser(id);
+  const u = await getUser(id);
+  return u && !u.removed ? u : null;
 }
 async function requireUser(req, role) {
   const u = await currentUser(req);
@@ -146,7 +149,7 @@ async function notifyUsers(ids, payload) {
 
 module.exports = {
   VAPID_PUBLIC_KEY, redis, err, fail, readBody, jsonBody,
-  roleForInvite, normName, cleanName, checkCode, setCode, getUser, saveUser, allUsers, publicUser,
+  roleForInvite, normName, cleanName, checkCode, setCode, getUser, saveUser, allUsers, activeUsers, publicUser,
   startSession, endSession, currentUser, requireUser,
   parisNow, sundayOf, weekLocked, push, validSub, notifyUsers,
 };
