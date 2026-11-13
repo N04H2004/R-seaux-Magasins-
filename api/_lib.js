@@ -37,14 +37,34 @@ async function jsonBody(req) {
 // ---------- accounts ----------
 const sha = (s) => crypto.createHash('sha256').update(String(s)).digest('hex');
 
-// Invitation codes decide the role. Only their hashes live here; env vars can replace them.
+// Invitation codes decide the role. The direction can generate a new code from the app (stored in Redis,
+// 'invite:<role>'); until it does, the built-in code below (only its hash lives here) or an env var applies.
 const INVITES = {
   direction: process.env.INVITE_DIRECTION ? sha(process.env.INVITE_DIRECTION.trim().toUpperCase()) : 'fecdbf68df4548a7b8625d937dac97d16b5f42ef9254129906e5e66cb3667fcb',
   cm: process.env.INVITE_CM ? sha(process.env.INVITE_CM.trim().toUpperCase()) : 'ab5f9300d73797d61ca6e53127e21a5160f08e6f8592a1cb632d92d41a5aeaae',
 };
-function roleForInvite(code) {
-  const h = sha(String(code || '').trim().toUpperCase());
-  return Object.keys(INVITES).find((r) => INVITES[r] === h) || null;
+const INVITE_ROLES = ['cm', 'direction'];
+async function roleForInvite(code) {
+  const c = String(code || '').trim().toUpperCase();
+  if (!c) return null;
+  for (const role of INVITE_ROLES) {
+    const current = await redis('GET', 'invite:' + role);
+    if (current ? current === c : INVITES[role] === sha(c)) return role;
+  }
+  return null;
+}
+// A new code replaces the previous one at once: the old one stops working.
+async function newInvite(role) {
+  if (!INVITE_ROLES.includes(role)) throw err(400, 'Rôle inconnu');
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const code = (role === 'cm' ? 'CM-' : 'DIR-') + Array.from(crypto.randomBytes(8), (b) => A[b % A.length]).join('');
+  await redis('SET', 'invite:' + role, code);
+  return code;
+}
+async function currentInvites() {
+  const out = {};
+  for (const role of INVITE_ROLES) out[role] = await redis('GET', 'invite:' + role); // null: still the built-in code
+  return out;
 }
 
 const normName = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase().replace(/\s+/g, ' ');
@@ -149,7 +169,7 @@ async function notifyUsers(ids, payload) {
 
 module.exports = {
   VAPID_PUBLIC_KEY, redis, err, fail, readBody, jsonBody,
-  roleForInvite, normName, cleanName, checkCode, setCode, getUser, saveUser, allUsers, activeUsers, publicUser,
+  roleForInvite, newInvite, currentInvites, normName, cleanName, checkCode, setCode, getUser, saveUser, allUsers, activeUsers, publicUser,
   startSession, endSession, currentUser, requireUser,
   parisNow, sundayOf, weekLocked, push, validSub, notifyUsers,
 };

@@ -350,6 +350,8 @@ button.shift { cursor: pointer; }
 .sheet::backdrop { background: rgba(0,0,0,.45); }
 .sheet form { padding: 20px 16px calc(18px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 14px; }
 .sheet h2 { margin: 0; font-size: 20px; }
+#sheet-sub { white-space: pre-line; margin: 0; }
+.sheet-code { margin: 0; font: 700 28px/1.2 var(--font-mono); letter-spacing: .04em; text-align: center; background: var(--bg); border: 1px dashed var(--line); border-radius: 12px; padding: 14px; user-select: all; }
 .sheet-btns { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
 .sheet-btns #sheet-ok { flex: 1; max-width: 220px; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -622,6 +624,7 @@ button.shift { cursor: pointer; }
 <dialog class="sheet" id="sheet">
   <form method="dialog" id="sheet-form">
     <h2 id="sheet-title"></h2>
+    <p class="sheet-code" id="sheet-code" hidden></p>
     <p class="note" id="sheet-sub" hidden></p>
     <div id="sheet-fields"></div>
     <p class="form-err" id="sheet-err" hidden></p>
@@ -1242,11 +1245,27 @@ window.startDashboard = (DATA) => {
         },
       });
     }
-    if (act === 'invites') openSheet({
-      title: 'Codes d\'invitation',
-      sub: 'Pour créer un compte, la personne choisit « Première connexion » et entre l\'un de ces codes. Contacte la personne qui gère l\'appli pour les obtenir ou les changer.',
-      fields: [], okLabel: 'Fermer', submit: async () => {},
-    });
+    if (act === 'invites') {
+      const { invites } = await api('/api/users');
+      const show = (c) => c || 'code de départ (non affichable)';
+      openSheet({
+        title: 'Codes d\'invitation',
+        sub: 'Pour créer son compte, la personne choisit « Première connexion » et entre le code de son rôle. Générer un nouveau code désactive aussitôt l\'ancien (les comptes déjà créés ne sont pas touchés).\n\nCommunity manager : ' + show(invites.cm) + '\nDirection : ' + show(invites.direction),
+        fields: [['role', 'Générer un nouveau code pour', 'select', [['cm', 'Community manager'], ['direction', 'Direction']]]],
+        okLabel: 'Générer', noFocus: true,
+        submit: async (v) => {
+          const r = await api('/api/users', { action: 'invite', role: v.role });
+          try { await navigator.clipboard.writeText(r.code); } catch (e) {}
+          openSheet({
+            title: 'Nouveau code ' + (v.role === 'cm' ? 'community manager' : 'direction'),
+            code: r.code, info: true,
+            sub: 'Il est copié : envoie-le à la personne. L\'ancien code ne fonctionne plus.',
+            fields: [], okLabel: 'Fermer', submit: async () => {},
+          });
+          throw Object.assign(new Error(''), { keepOpen: true });
+        },
+      });
+    }
   }));
 
   // ---------- bottom sheet form ----------
@@ -1258,6 +1277,8 @@ window.startDashboard = (DATA) => {
     $('#sheet-sub').hidden = !cfg.sub; $('#sheet-sub').textContent = cfg.sub || '';
     $('#sheet-err').hidden = true;
     $('#sheet-del').hidden = !cfg.remove;
+    $('#sheet-cancel').hidden = !!cfg.info;
+    $('#sheet-code').hidden = !cfg.code; $('#sheet-code').textContent = cfg.code || '';
     $('#sheet-ok').textContent = cfg.okLabel || 'Enregistrer';
     $('#sheet-ok').className = 'btn' + (cfg.okClass ? ' ' + cfg.okClass : '');
     const box = $('#sheet-fields'); box.replaceChildren();
@@ -1282,7 +1303,7 @@ window.startDashboard = (DATA) => {
     const ok = $('#sheet-ok'), del = $('#sheet-del');
     ok.disabled = del.disabled = true; $('#sheet-err').hidden = true;
     try { await fn(sheetValues()); sheet.close(); }
-    catch (x) { $('#sheet-err').textContent = x.message; $('#sheet-err').hidden = false; }
+    catch (x) { if (!x.keepOpen) { $('#sheet-err').textContent = x.message; $('#sheet-err').hidden = false; } } // keepOpen: the submit opened a follow-up sheet
     ok.disabled = del.disabled = false;
   }
   $('#sheet-form').addEventListener('submit', (e) => { e.preventDefault(); runSheet(sheetCfg.submit); });

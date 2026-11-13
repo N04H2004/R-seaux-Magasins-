@@ -1,13 +1,14 @@
-// GET: the active accounts (direction only). POST {action}: 'change' my own code, 'reset' someone's code (direction only),
+// GET: the active accounts and the current invitation codes (direction only).
+// POST 'invite' {role}: generate a new invitation code for that role (direction only); the previous one stops working. POST {action}: 'change' my own code, 'reset' someone's code (direction only),
 // 'remove' an account (direction only): it can no longer sign in, its first name is freed, its timesheet stays readable.
-const { redis, err, fail, jsonBody, normName, checkCode, setCode, getUser, saveUser, activeUsers, publicUser, requireUser } = require('./_lib');
+const { redis, err, fail, jsonBody, newInvite, currentInvites, normName, checkCode, setCode, getUser, saveUser, activeUsers, publicUser, requireUser } = require('./_lib');
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   try {
     if (req.method === 'GET') {
       await requireUser(req, 'direction');
-      return res.json({ ok: true, users: (await activeUsers()).map(publicUser) });
+      return res.json({ ok: true, users: (await activeUsers()).map(publicUser), invites: await currentInvites() });
     }
     if (req.method !== 'POST') throw err(405, 'Méthode non permise');
     const b = await jsonBody(req);
@@ -16,6 +17,10 @@ module.exports = async (req, res) => {
       if (!checkCode(b.oldCode, me)) throw err(401, 'Ancien code incorrect');
       setCode(me, b.code); await saveUser(me);
       return res.json({ ok: true });
+    }
+    if (b.action === 'invite') {
+      await requireUser(req, 'direction');
+      return res.json({ ok: true, role: b.role, code: await newInvite(b.role) });
     }
     if (b.action === 'remove') {
       const me = await requireUser(req, 'direction');

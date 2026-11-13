@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
     }
 
     if (b.action === 'register') {
-      const role = roleForInvite(b.invite);
+      const role = await roleForInvite(b.invite);
       if (!role) throw err(400, 'Code d\'invitation inconnu');
       if (await redis('GET', 'uname:' + key)) throw err(409, 'Ce prénom est déjà pris. Ajoute l\'initiale de ton nom (ex. « Noam C. »).');
       const u = { id: crypto.randomBytes(8).toString('hex'), firstName, role, createdAt: new Date().toISOString() };
