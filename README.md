@@ -8,7 +8,7 @@ L'appli demande une connexion (prénom + code personnel). Pour créer un compte,
 
 - **Statistiques** : chargées depuis `/api/data` (fichier `data.json`, non accessible publiquement), mises à jour chaque lundi par la tâche planifiée (voir `MISE_A_JOUR.md`).
 - **Planning** : la timesheet du community manager. Il saisit ses shifts et peut les modifier jusqu'au dimanche 23 h 59 ; la direction consulte, modifie tout et propose des shifts que le CM accepte ou refuse.
-- **Réunion** : la semaine de réunion (7 jours finissant à la dernière mise à jour) comparée à la précédente, l'historique semaine par semaine (`weeks` dans `data.json`), le travail du CM, les objectifs du mois, les actions décidées en réunion et les rapports mensuels (`reports`, exportables en PDF). Le bouton « Télécharger la présentation » génère le PowerPoint de la réunion dans le navigateur (`assets/meeting.js`, `assets/vendor/pptxgen.bundle.js`) ; la première réunion du mois y ajoute le rapport du mois écoulé.
+- **Réunion** : la semaine complète (lundi → dimanche) qui précède la réunion, comparée à la précédente, l'historique semaine par semaine (`weeks` dans `data.json`), le travail du CM, les objectifs du mois, les actions décidées en réunion et les rapports mensuels (`reports`, exportables en PDF). Le bouton « Télécharger la présentation » génère le PowerPoint de la réunion dans le navigateur (`assets/meeting.js`, `assets/vendor/pptxgen.bundle.js`) ; la première réunion du mois y ajoute le rapport du mois écoulé.
 - **Stockage** : Upstash Redis branché sur le projet Vercel (comptes, sessions, shifts, abonnements aux notifications).
 
 ## Déploiement Vercel

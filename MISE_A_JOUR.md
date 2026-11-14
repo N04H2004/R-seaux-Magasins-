@@ -19,7 +19,7 @@ Le site (statistiques Instagram de deux magasins à Nice) est hébergé sur Verc
    Garde inchangés `id`, `name`, `handle`, `place`, `brand` de chaque magasin, `plan`, et mets `source` à « Instagram Insights (API Meta) ».
 4. Mets à jour `updated` (date du jour) et `period` (`start`/`end`).
 4bis. Mets à jour la **note du mois** de chaque magasin (tableau `months`, voir la section « Note du mois » plus bas).
-4ter. Lance `node scripts/history.js` (après avoir mis à jour `period`, `daily`, `posts` et `months`). Il ajoute à `weeks` la semaine de réunion (les 7 jours finissant le `period.end`) et, pour chaque mois qui vient d'être clôturé (`final`), ouvre `reports["AAAA-MM"]` avec ses 3 meilleurs posts. S'il affiche « rapports à rédiger », écris pour chaque magasin listé, dans `reports["AAAA-MM"].stores.<magasin>` :
+4ter. Lance `node scripts/history.js` (après avoir mis à jour `period`, `daily`, `posts` et `months`). Il met à jour dans `weeks` chaque semaine complète du lundi au dimanche (la réunion présente la semaine complète qui précède) et, pour chaque mois qui vient d'être clôturé (`final`), ouvre `reports["AAAA-MM"]` avec ses 3 meilleurs posts. S'il affiche « rapports à rédiger », écris pour chaque magasin listé, dans `reports["AAAA-MM"].stores.<magasin>` :
    - `summary` : 3 à 4 constats sur le mois clôturé (note en étoiles, objectifs atteints ou manqués avec leurs chiffres `actual`/`goals`, meilleurs posts, évolution par rapport au mois d'avant) ;
    - `priorities` : 2 à 4 priorités courtes pour le mois qui commence.
    Même ton que `summary` et `recos` ; chaque chiffre doit venir de `data.json`. Ne modifie jamais un rapport déjà rédigé. L'appli s'en sert pour la présentation de la réunion et le rapport mensuel.

@@ -32,7 +32,8 @@ need(Array.isArray(d.weeks), '`weeks` manquant : lance `node scripts/history.js`
 for (const w of d.weeks || []) {
   need(DATE.test(w.start) && DATE.test(w.end) && w.stores && Object.keys(w.stores).length === 2, 'weeks ' + w.end + ' : entrée incomplète');
 }
-if (d.weeks && d.weeks.length) need(d.weeks[d.weeks.length - 1].end === (d.period || {}).end, 'la dernière semaine de `weeks` doit finir le ' + (d.period || {}).end + ' : lance `node scripts/history.js`');
+for (const w of d.weeks || []) need(new Date(w.start + 'T12:00:00Z').getUTCDay() === 1 && new Date(w.end + 'T12:00:00Z').getUTCDay() === 0, 'weeks ' + w.end + ' : une semaine va du lundi au dimanche');
+if (d.weeks && d.weeks.length && d.period) need(Date.parse(d.period.end) - Date.parse(d.weeks[d.weeks.length - 1].end) < 7 * 864e5, 'la dernière semaine complète manque dans `weeks` : lance `node scripts/history.js`');
 for (const [month, r] of Object.entries(d.reports || {})) {
   for (const [id, s] of Object.entries(r.stores || {})) {
     need(Array.isArray(s.summary) && s.summary.length >= 3, 'reports ' + month + ' ' + id + ' : `summary` à rédiger (3 à 4 constats)');

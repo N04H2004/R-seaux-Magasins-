@@ -1,17 +1,16 @@
 // Keeps the history that the 30-day window forgets, inside data.json:
-//   weeks[]   one entry per meeting week (the 7 days ending on period.end), upserted on every update;
+//   weeks[]   one entry per calendar week (Monday → Sunday) fully covered by the daily figures, upserted on every
+//             update: a meeting presents the full week before the one it falls in;
 //   reports{} one entry per closed month (status "final"), created once with its top posts; the weekly update
 //             then writes its texts (summary, priorities) — see MISE_A_JOUR.md.
 //
-//   node scripts/history.js              → upsert the week ending on period.end, open reports for newly closed months
-//   node scripts/history.js --backfill 4 → also rebuild the 3 weeks before it from the daily figures still available
+//   node scripts/history.js → upsert every complete Monday–Sunday week of the daily window, open reports for newly closed months
 const fs = require('fs');
 const path = require('path');
 
 const FILE = path.join(__dirname, '..', 'data.json');
 const d = JSON.parse(fs.readFileSync(FILE, 'utf8'));
 const addDays = (s, n) => new Date(Date.parse(s + 'T12:00:00Z') + n * 864e5).toISOString().slice(0, 10);
-const n = process.argv.includes('--backfill') ? Math.max(1, +process.argv[process.argv.indexOf('--backfill') + 1] || 4) : 1;
 
 function weekEntry(end) {
   const start = addDays(end, -6);
@@ -35,10 +34,14 @@ function weekEntry(end) {
   return { start, end, stores };
 }
 
-d.weeks = d.weeks || [];
-for (let i = n - 1; i >= 0; i--) {
-  const w = weekEntry(addDays(d.period.end, -7 * i));
-  if (!w) continue;
+// weeks always run Monday → Sunday, whatever day the update runs
+const isSunday = (s) => new Date(s + 'T12:00:00Z').getUTCDay() === 0;
+d.weeks = (d.weeks || []).filter((w) => isSunday(w.end));
+let lastSunday = d.period.end;
+while (!isSunday(lastSunday)) lastSunday = addDays(lastSunday, -1);
+for (let end = lastSunday; ; end = addDays(end, -7)) {
+  const w = weekEntry(end);
+  if (!w) break; // older weeks are no longer fully covered by the daily window
   const at = d.weeks.findIndex((x) => x.end === w.end);
   if (at >= 0) d.weeks[at] = w; else d.weeks.push(w);
 }

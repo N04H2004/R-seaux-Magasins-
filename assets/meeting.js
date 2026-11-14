@@ -23,10 +23,13 @@
   const el = (...a) => window.App.el(...a);
 
   // ---------- derived figures ----------
-  function weekInfo(DATA) {
+  // A meeting presents the full Monday → Sunday week before the week it falls in.
+  function weekInfo(DATA, meeting) {
     const W = DATA.weeks || [];
-    const cur = W[W.length - 1], prev = W[W.length - 2];
-    return { cur, prev, list: W };
+    const end = addDays(meeting, -((D(meeting).getUTCDay() + 6) % 7) - 1); // the Sunday before the meeting's week
+    const exact = W.find((w) => w.end === end);
+    const cur = exact || W[W.length - 1]; // not updated yet: the latest complete week, flagged as such
+    return { cur, prev: cur && W.find((w) => w.end === addDays(cur.end, -7)), list: W.filter((w) => !cur || w.end <= cur.end), expectedEnd: end, stale: !exact };
   }
   function nextMeeting(today, day) { // day 1 = Monday … 7 = Sunday
     const dow = (D(today).getUTCDay() + 6) % 7 + 1;
@@ -43,12 +46,16 @@
     if (!window.MR) { $('#mt-when').textContent = 'Chargement des statistiques…'; document.addEventListener('mr-ready', open, { once: true }); return; }
     const { DATA } = window.MR;
     const me = window.App.user();
-    const wk = weekInfo(DATA);
-    if (!wk.cur) { $('#mt-when').textContent = 'L\'historique des semaines n\'est pas encore disponible.'; return; }
     let r;
-    try { r = await window.App.api('/api/meeting?' + new URLSearchParams({ from: wk.cur.start, to: wk.cur.end })); }
-    catch (x) { $('#mt-when').textContent = 'Impossible de charger la réunion : ' + x.message; return; }
+    try {
+      const info = await window.App.api('/api/meeting');
+      const meeting0 = nextMeeting(info.today, info.meetingDay);
+      const w0 = weekInfo(DATA, meeting0);
+      if (!w0.cur) { $('#mt-when').textContent = 'L\'historique des semaines n\'est pas encore disponible.'; return; }
+      r = await window.App.api('/api/meeting?' + new URLSearchParams({ from: w0.cur.start, to: w0.cur.end }));
+    } catch (x) { $('#mt-when').textContent = 'Impossible de charger la réunion : ' + x.message; return; }
     const meeting = nextMeeting(r.today, r.meetingDay);
+    const wk = weekInfo(DATA, meeting);
     const pm = prevMonth(monthOf(meeting));
     // the first meeting of a month adds the report of the month before; ?mois=AAAA-MM forces a given month
     const forced = new URLSearchParams(location.search).get('mois');
@@ -57,8 +64,11 @@
 
     $('#mt-when').textContent = 'Prochaine réunion : ' + fLong.format(D(meeting)) + ' · semaine du ' + fShort.format(D(wk.cur.start)) + ' au ' + fShort.format(D(wk.cur.end));
     $('#mt-pptnote').textContent = sentence('À ouvrir sur ordinateur, avec les chiffres jusqu\'au ' + fShort.format(D(wk.cur.end)) + (monthly ? ' et le rapport ' + window.MR.of(monthly) : ''));
-    $('#mt-banner').hidden = !monthly;
-    if (monthly) $('#mt-banner').textContent = 'Première réunion du mois : le rapport ' + window.MR.of(monthly) + ' est ajouté à la présentation.';
+    const banner = [];
+    if (wk.stale) banner.push('Les chiffres de la semaine du ' + fShort.format(D(addDays(wk.expectedEnd, -6))) + ' au ' + fShort.format(D(wk.expectedEnd)) + ' arriveront avec la prochaine mise à jour (le lundi) : en attendant, la semaine affichée est la dernière complète.');
+    if (monthly) banner.push('Première réunion du mois : le rapport ' + window.MR.of(monthly) + ' est ajouté à la présentation.');
+    $('#mt-banner').hidden = !banner.length;
+    $('#mt-banner').textContent = banner.join(' ');
     renderWeek(); renderTrend(); renderCm(); renderGoals(); renderActions(); renderReports(); renderSettings();
   }
 
@@ -190,7 +200,7 @@
     sel.replaceChildren(...DAYS.map((d, i) => { const o = el('option', '', cap(d)); o.value = i + 1; o.selected = i + 1 === r.meetingDay; return o; }));
   }
   $('#mt-day').addEventListener('change', async (e) => {
-    try { await window.App.api('/api/meeting', { action: 'day', day: +e.target.value }); window.App.toast('Réunion le ' + DAYS[e.target.value - 1] + '. Pense à décaler la mise à jour automatique sur ce jour.'); open(); }
+    try { await window.App.api('/api/meeting', { action: 'day', day: +e.target.value }); window.App.toast('Réunion le ' + DAYS[e.target.value - 1] + '.'); open(); }
     catch (x) { window.App.toast(x.message); }
   });
 

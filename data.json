@@ -1636,11 +1636,11 @@
  ],
  "weeks": [
   {
-   "start": "2026-10-17",
-   "end": "2026-10-23",
+   "start": "2026-10-19",
+   "end": "2026-10-25",
    "stores": {
     "netto": {
-     "views": 801,
+     "views": 904,
      "followersGained": 4,
      "followers": 94,
      "posts": 2,
@@ -1654,39 +1654,39 @@
      }
     },
     "cessole": {
-     "views": 603,
-     "followersGained": 6,
+     "views": 1355,
+     "followersGained": 5,
      "followers": 229,
-     "posts": 1,
-     "reels": 1,
+     "posts": 2,
+     "reels": 2,
      "topPost": {
-      "id": "18079502660397067",
-      "title": "Tortellini gratinés jambon-raclette",
+      "id": "17938720215391703",
+      "title": "Nouvelles baguettes goûtées par les clients",
       "format": "Reel",
-      "views": 269,
-      "link": "https://www.instagram.com/reel/DewY4PEsOt6/"
+      "views": 639,
+      "link": "https://www.instagram.com/reel/De45Pa8xAYg/"
      }
     }
    }
   },
   {
-   "start": "2026-10-24",
-   "end": "2026-10-30",
+   "start": "2026-10-26",
+   "end": "2026-11-01",
    "stores": {
     "netto": {
-     "views": 366,
-     "followersGained": 1,
-     "followers": 95,
+     "views": 326,
+     "followersGained": 3,
+     "followers": 97,
      "posts": 0,
      "reels": 0,
      "topPost": null
     },
     "cessole": {
-     "views": 2173,
-     "followersGained": 2,
-     "followers": 231,
-     "posts": 2,
-     "reels": 2,
+     "views": 1525,
+     "followersGained": 3,
+     "followers": 232,
+     "posts": 1,
+     "reels": 1,
      "topPost": {
       "id": "17886080949652618",
       "title": "Panier à 10 € version Halloween",
@@ -1698,12 +1698,12 @@
    }
   },
   {
-   "start": "2026-10-31",
-   "end": "2026-11-06",
+   "start": "2026-11-02",
+   "end": "2026-11-08",
    "stores": {
     "netto": {
-     "views": 2187,
-     "followersGained": 7,
+     "views": 2204,
+     "followersGained": 5,
      "followers": 102,
      "posts": 3,
      "reels": 1,
@@ -1716,10 +1716,10 @@
      }
     },
     "cessole": {
-     "views": 3213,
-     "followersGained": 2,
+     "views": 3727,
+     "followersGained": 1,
      "followers": 233,
-     "posts": 2,
+     "posts": 3,
      "reels": 0,
      "topPost": {
       "id": "18222548683345969",
@@ -1727,34 +1727,6 @@
       "format": "Carrousel",
       "views": 752,
       "link": "https://www.instagram.com/p/DfWpkzYEU0n/"
-     }
-    }
-   }
-  },
-  {
-   "start": "2026-11-07",
-   "end": "2026-11-13",
-   "stores": {
-    "netto": {
-     "views": 340,
-     "followersGained": 2,
-     "followers": 104,
-     "posts": 0,
-     "reels": 0,
-     "topPost": null
-    },
-    "cessole": {
-     "views": 2103,
-     "followersGained": 4,
-     "followers": 237,
-     "posts": 2,
-     "reels": 1,
-     "topPost": {
-      "id": "17906811162356373",
-      "title": "Anti-gaspi avec HopHopFood",
-      "format": "Photo",
-      "views": 651,
-      "link": "https://www.instagram.com/p/Dfb1-0bMPMK/"
      }
     }
    }
