@@ -9,14 +9,14 @@ Le site (statistiques Instagram de deux magasins à Nice) est hébergé sur Verc
 
 ## Étapes
 1. Travaille sur la branche `claude/exciting-darwin-jm5s48`. Lis `data.json` pour connaître le schéma exact et le ton des textes actuels.
-2. Fenêtre : les 30 derniers jours complets se terminant hier (heure de Paris), et la période de 30 jours précédente pour la comparaison. Utilise `get_today` de Supermetrics pour les dates.
-3. Récupère les données avec le connecteur Supermetrics (outil `instagram_insights`, ds_id `IGI`). Comptes : netto.temple = `17841432089005834`, intermarche.cessole = `17841444946262250`. Utilise `field_discovery` pour les ID de champs ; n'invente jamais un ID ni une valeur. Il te faut, pour chaque magasin :
-   - `followers`, `mediaCount` (valeurs actuelles du profil) ;
-   - `daily` : une ligne par jour de la fenêtre avec `date`, `followers` (nouveaux abonnés du jour, `null` si Instagram ne le fournit pas, c'est le cas sous 100 abonnés), `reach`, `views`, `engaged` (comptes ayant interagi) ;
-   - `compare` : totaux `views`/`engaged` sur la fenêtre et `viewsPrev`/`engagedPrev` sur la période précédente ;
-   - `posts` : les publications du fil (Reel, Photo, Carrousel), triées par vues décroissantes, avec `id`, `time` (« AAAA-MM-JJ HH:MM », heure de Paris), `format`, `title` (titre court en français tiré de la légende ; « Photo sans légende (JJ mois) » s'il n'y en a pas), `views`, `reach`, `interactions`, `likes`, `comments`, `saves`, `shares`, `link`, `watch` (temps de visionnage moyen en secondes, Reels seulement, sinon null) et `skip` (taux de passage en %, Reels seulement, sinon null). Publications des 2 derniers mois environ ;
-   - `audience` : `hours` (24 valeurs, abonnés en ligne par heure, heure de Paris), `ages` ([tranche, nombre]), `cities` (8 premières [ville, nombre]), ou `null` si Instagram ne les fournit pas (moins de 100 abonnés). Ces données sont secondaires : si l'une des trois revient vide alors que le compte a plus de 100 abonnés, garde la valeur actuelle de `data.json` pour celle-là (ou `null` s'il n'y en a pas) et continue. Ne t'arrête jamais pour l'audience.
-   Garde inchangés `id`, `name`, `handle`, `place`, `brand` de chaque magasin, et `source`.
+2. Récupère les chiffres avec `node scripts/fetch-instagram.js` (environ 1 à 2 minutes). Il interroge l'API de Meta (Instagram Graph API) pour les deux comptes et écrit `scripts/out/instagram.json` : fenêtre des 30 derniers jours complets se terminant hier (heure de Paris), et les 30 jours d'avant pour la comparaison. N'utilise plus Supermetrics (l'abonnement a pris fin). La clé d'accès est ajoutée automatiquement par le proxy réseau de la session : ne la cherche pas et ne la demande pas.
+   - Code de sortie 2 (« ÉCHEC ») : une donnée principale manque, voir « En cas de problème ».
+   - Les lignes `warnings` listent les données secondaires illisibles : signale-les dans ton résumé final.
+3. Reporte dans `data.json`, pour chaque magasin (`stores.netto`, `stores.cessole` du fichier produit), sans recalculer les chiffres :
+   - `followers`, `mediaCount`, `daily` et `compare` tels quels ;
+   - `posts` : reprends les publications produites (déjà triées par vues décroissantes) en remplissant `title` : un titre court en français tiré de `caption`, dans le même style que les titres actuels (« Photo sans légende (JJ mois) » si la légende est vide). Ne garde pas le champ `caption` dans `data.json` ;
+   - `audience` : `hours`, `ages`, `cities`. Ces données sont secondaires : si l'une vaut `null`, garde la valeur actuelle de `data.json` pour celle-là (ou `null` s'il n'y en a pas) et continue. Ne t'arrête jamais pour l'audience.
+   Garde inchangés `id`, `name`, `handle`, `place`, `brand` de chaque magasin, `plan`, et mets `source` à « Instagram Insights (API Meta) ».
 4. Mets à jour `updated` (date du jour) et `period` (`start`/`end`).
 4bis. Mets à jour la **note du mois** de chaque magasin (tableau `months`, voir la section « Note du mois » plus bas).
 5. Réécris pour chaque magasin, à partir des nouveaux chiffres uniquement, `summary` (4 constats courts) et `recos` (5 à 7 paires [titre, explication]), en français, tutoiement, même style concret que les textes actuels. Chaque affirmation doit être vérifiable dans les données.
@@ -32,12 +32,7 @@ Ne modifie jamais une entrée `reference` ou `final`. Chaque lundi :
 1. **Si le mois de l'entrée `in_progress` est terminé** (on est déjà dans le mois suivant) : recalcule son `actual` sur le mois complet (du 1er au dernier jour), mets `through` au dernier jour du mois et passe `status` à `final`. Puis crée l'entrée du nouveau mois avec ses `goals` (règles ci-dessous) et `status: "in_progress"`.
 2. **Sinon** : recalcule l'`actual` du mois en cours, du 1er du mois jusqu'à hier, et mets `through` à la date d'hier.
 
-Comment calculer `actual` pour un mois (Supermetrics, ds_id `IGI`, fuseau `Europe/Paris`, plage personnalisée du 1er du mois à la fin de la période) :
-- `views` et `engaged` : une seule requête par compte, sans dimension de date, avec les champs `profile_views` et `accounts_engaged`. Ne fais jamais la somme de valeurs journalières de `accounts_engaged`.
-- `posts` : nombre de publications du fil (Reels, photos, carrousels ; pas les stories) publiées dans le mois. Champs `media_id`, `timestamp`, `media_product_type` ; exclue `STORY`.
-- `topReel` : vues (`media_views`) du Reel publié dans le mois qui en a le plus, mesurées au moment de la mise à jour ; `null` s'il n'y a aucun Reel.
-- `reels` et `watch` : nombre de Reels publiés dans le mois, et moyenne de `media_reel_avg_watch_time` (en secondes, une décimale) sur ces Reels ; `watch` vaut `null` s'il n'y a aucun Reel.
-- `followers` : nombre total d'abonnés à la fin de la période. Pour un mois qui vient de se terminer : abonnés actuels moins les nouveaux abonnés depuis le 1er du nouveau mois (`follower_count` journalier) ; si ce détail n'est pas disponible (moins de 100 abonnés), prends le nombre actuel.
+Les valeurs `actual` sont déjà calculées par `scripts/fetch-instagram.js` : `stores.<magasin>.months["AAAA-MM"]` donne `through` et `actual` pour le mois en cours (jusqu'à hier) et pour le mois précédent (complet, pour le clôturer). Reporte-les telles quelles, sans les recalculer ni additionner de valeurs journalières.
 
 **Si le magasin a un `plan`** (cible à long terme, objet `plan` du magasin) et que `plan.months` contient le nouveau mois : les `goals` du nouveau mois sont ceux de `plan.months[mois]`. Exception : si l'`actual` du mois qui vient de se terminer dépasse déjà l'objectif prévu pour le nouveau mois, prends pour `views`, `topReel` et `followers` la plus grande des deux valeurs entre l'objectif prévu et `actual du mois terminé × 1,10` (arrondi comme ci-dessous). Ne modifie jamais `plan` toi-même.
 
@@ -53,7 +48,7 @@ Ne change pas ces règles toi-même. Si l'utilisateur a demandé d'autres object
 Contexte pour les recommandations : à Intermarché Cessole, un QR code Instagram est déjà affiché en caisse. Ne le recommande pas comme une nouveauté (tu peux proposer de le rendre plus visible ou de l'animer).
 
 ## En cas de problème
-Arrête-toi sans rien pousser seulement si une donnée **principale** manque : le connecteur Supermetrics n'est pas disponible ou demande une reconnexion, ou un compte ne renvoie pas ses chiffres journaliers (`daily`), ses totaux (`compare`, `months`), son nombre d'abonnés ou ses publications. N'invente jamais un chiffre. Explique alors clairement ce qui bloque et comment le corriger.
+Arrête-toi sans rien pousser seulement si une donnée **principale** manque : `scripts/fetch-instagram.js` sort en « ÉCHEC » (clé Meta refusée ou expirée, API inaccessible, compte illisible), ou un compte n'a pas ses chiffres journaliers (`daily`), ses totaux (`compare`, `months`), son nombre d'abonnés ou ses publications. Si l'API répond que la clé est invalide, indique qu'il faut régénérer le jeton de l'utilisateur système « mes-reseaux-stats » (portefeuille Meta « Mes Réseaux ») et le réenregistrer pour graph.facebook.com dans l'environnement Claude. N'invente jamais un chiffre. Explique alors clairement ce qui bloque et comment le corriger.
 
 Une donnée **secondaire** manquante (âges, villes ou heures de l'audience, temps de visionnage d'un Reel isolé) ne bloque pas la mise à jour : garde la valeur précédente comme indiqué plus haut, pousse le reste, et signale-le en une ligne dans ton résumé final.
 
