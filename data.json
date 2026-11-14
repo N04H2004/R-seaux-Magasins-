@@ -656,7 +656,7 @@
       "engaged": 150,
       "topReel": 430,
       "followers": 97,
-      "watch": 6.0,
+      "watch": 6,
       "reels": 3
      },
      "goals": {
@@ -1633,5 +1633,216 @@
     "why": "Le plan part de fin septembre, au début du travail sur le compte : environ 900 clients du quartier et 600 abonnés d'ailleurs d'ici avril 2027, chaque mois au moins un Reel qui perce bien au-delà des abonnés, et des Reels regardés 20 s en moyenne."
    }
   }
- ]
+ ],
+ "weeks": [
+  {
+   "start": "2026-10-17",
+   "end": "2026-10-23",
+   "stores": {
+    "netto": {
+     "views": 801,
+     "followersGained": 4,
+     "followers": 94,
+     "posts": 2,
+     "reels": 2,
+     "topPost": {
+      "id": "18129656725872091",
+      "title": "Octobre Rose : l'équipe mobilisée",
+      "format": "Reel",
+      "views": 488,
+      "link": "https://www.instagram.com/reel/Deyilycu-UZ/"
+     }
+    },
+    "cessole": {
+     "views": 603,
+     "followersGained": 6,
+     "followers": 229,
+     "posts": 1,
+     "reels": 1,
+     "topPost": {
+      "id": "18079502660397067",
+      "title": "Tortellini gratinés jambon-raclette",
+      "format": "Reel",
+      "views": 269,
+      "link": "https://www.instagram.com/reel/DewY4PEsOt6/"
+     }
+    }
+   }
+  },
+  {
+   "start": "2026-10-24",
+   "end": "2026-10-30",
+   "stores": {
+    "netto": {
+     "views": 366,
+     "followersGained": 1,
+     "followers": 95,
+     "posts": 0,
+     "reels": 0,
+     "topPost": null
+    },
+    "cessole": {
+     "views": 2173,
+     "followersGained": 2,
+     "followers": 231,
+     "posts": 2,
+     "reels": 2,
+     "topPost": {
+      "id": "17886080949652618",
+      "title": "Panier à 10 € version Halloween",
+      "format": "Reel",
+      "views": 666,
+      "link": "https://www.instagram.com/reel/De98NsFxGVu/"
+     }
+    }
+   }
+  },
+  {
+   "start": "2026-10-31",
+   "end": "2026-11-06",
+   "stores": {
+    "netto": {
+     "views": 2187,
+     "followersGained": 7,
+     "followers": 102,
+     "posts": 3,
+     "reels": 1,
+     "topPost": {
+      "id": "18111475139224054",
+      "title": "Espace sport et coach pour l'équipe",
+      "format": "Reel",
+      "views": 873,
+      "link": "https://www.instagram.com/reel/DfXG9AAOA32/"
+     }
+    },
+    "cessole": {
+     "views": 3213,
+     "followersGained": 2,
+     "followers": 233,
+     "posts": 2,
+     "reels": 0,
+     "topPost": {
+      "id": "18222548683345969",
+      "title": "Halloween : les collègues déguisés",
+      "format": "Carrousel",
+      "views": 752,
+      "link": "https://www.instagram.com/p/DfWpkzYEU0n/"
+     }
+    }
+   }
+  },
+  {
+   "start": "2026-11-07",
+   "end": "2026-11-13",
+   "stores": {
+    "netto": {
+     "views": 340,
+     "followersGained": 2,
+     "followers": 104,
+     "posts": 0,
+     "reels": 0,
+     "topPost": null
+    },
+    "cessole": {
+     "views": 2103,
+     "followersGained": 4,
+     "followers": 237,
+     "posts": 2,
+     "reels": 1,
+     "topPost": {
+      "id": "17906811162356373",
+      "title": "Anti-gaspi avec HopHopFood",
+      "format": "Photo",
+      "views": 651,
+      "link": "https://www.instagram.com/p/Dfb1-0bMPMK/"
+     }
+    }
+   }
+  }
+ ],
+ "reports": {
+  "2026-10": {
+   "month": "2026-10",
+   "stores": {
+    "netto": {
+     "topPosts": [
+      {
+       "id": "18129656725872091",
+       "title": "Octobre Rose : l'équipe mobilisée",
+       "format": "Reel",
+       "views": 488,
+       "shares": 1,
+       "link": "https://www.instagram.com/reel/Deyilycu-UZ/"
+      },
+      {
+       "id": "17885859936504766",
+       "title": "Gratin de rösti à la mimolette",
+       "format": "Reel",
+       "views": 251,
+       "shares": 0,
+       "link": "https://www.instagram.com/reel/DewZD-dO5qf/"
+      },
+      {
+       "id": "17914486230467433",
+       "title": "Recette n°5 : pâtes crémeuses au pesto",
+       "format": "Reel",
+       "views": 121,
+       "shares": 0,
+       "link": "https://www.instagram.com/reel/DeMZfkUO6fE/"
+      }
+     ],
+     "summary": [
+      "2 étoiles sur 5 : les vues (3 920 pour 2 430 visées) et les réactions sont atteintes ; publications, abonnés et visionnage sont manqués.",
+      "Seulement 3 publications sur les 18 prévues : c'est le premier frein du compte.",
+      "Le Reel Octobre Rose avec l'équipe est le meilleur post du mois (488 vues) ; les recettes filmées restent sous 260 vues.",
+      "97 abonnés fin octobre, à 3 de la barre des 100, franchie début novembre."
+     ],
+     "priorities": [
+      "Tenir 4 publications par semaine, préparées et programmées à l'avance.",
+      "Mettre l'équipe à l'image chaque semaine, sur le modèle d'Octobre Rose.",
+      "Revoir les recettes : plat fini et prix dès la première seconde."
+     ]
+    },
+    "cessole": {
+     "topPosts": [
+      {
+       "id": "17872887045638542",
+       "title": "Panier apéro à moins de 10 €",
+       "format": "Reel",
+       "views": 1151,
+       "shares": 13,
+       "link": "https://www.instagram.com/reel/DeHx4vrsAfb/"
+      },
+      {
+       "id": "18150605239556844",
+       "title": "Dégustation du croustillant du traiteur asiatique",
+       "format": "Reel",
+       "views": 1052,
+       "shares": 22,
+       "link": "https://www.instagram.com/reel/DeKNrRVMTuJ/"
+      },
+      {
+       "id": "17957039604080610",
+       "title": "Réunion annuelle : Objectif 2027",
+       "format": "Reel",
+       "views": 1025,
+       "shares": 4,
+       "link": "https://www.instagram.com/reel/Dd880XSMH5v/"
+      }
+     ],
+     "summary": [
+      "1 étoile sur 5 : seules les vues sont atteintes (10 489 pour 8 530 visées) ; le visionnage manque de peu (14,4 s pour 15 s).",
+      "11 publications sur les 18 prévues, avec une pause du 13 au 20 octobre.",
+      "La série « Panier à moins de 10 € » et les dégustations dominent : panier apéro 1 151 vues, croustillant du traiteur 1 052 vues et 22 partages.",
+      "235 abonnés fin octobre, loin des 272 visés : le recrutement d'abonnés reste le point faible."
+     ],
+     "priorities": [
+      "Publier 4 fois par semaine, sans pause.",
+      "Faire de la série « Panier à moins de 10 € » un rendez-vous fixe.",
+      "Animer le QR code en caisse pour recruter des abonnés."
+     ]
+    }
+   }
+  }
+ }
 }

@@ -28,5 +28,16 @@ for (const s of d.stores || []) {
     if (m.goals) need(Object.values(m.goals).every(Number.isFinite), at('months ' + m.month + ' : goals doit ne contenir que des nombres'));
   }
 }
+need(Array.isArray(d.weeks), '`weeks` manquant : lance `node scripts/history.js`');
+for (const w of d.weeks || []) {
+  need(DATE.test(w.start) && DATE.test(w.end) && w.stores && Object.keys(w.stores).length === 2, 'weeks ' + w.end + ' : entrée incomplète');
+}
+if (d.weeks && d.weeks.length) need(d.weeks[d.weeks.length - 1].end === (d.period || {}).end, 'la dernière semaine de `weeks` doit finir le ' + (d.period || {}).end + ' : lance `node scripts/history.js`');
+for (const [month, r] of Object.entries(d.reports || {})) {
+  for (const [id, s] of Object.entries(r.stores || {})) {
+    need(Array.isArray(s.summary) && s.summary.length >= 3, 'reports ' + month + ' ' + id + ' : `summary` à rédiger (3 à 4 constats)');
+    need(Array.isArray(s.priorities) && s.priorities.length >= 2, 'reports ' + month + ' ' + id + ' : `priorities` à rédiger (2 à 4 priorités)');
+  }
+}
 if (problems.length) { console.error('data.json : ' + problems.length + ' problème(s)\n- ' + problems.join('\n- ')); process.exit(1); }
 console.log('data.json OK');

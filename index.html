@@ -284,7 +284,7 @@ footer { margin-top: 10px; }
 .hello b { display: block; font-family: var(--font-display); font-weight: 800; font-stretch: 80%; font-size: 21px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .switch { order: 3; flex-basis: 100%; }
 @media (min-width: 821px) { .switch { order: 0; flex-basis: auto; } }
-body[data-tab="planning"] .switch { display: none; }
+body[data-tab="planning"] .switch, body[data-tab="meeting"] .switch { display: none; }
 .menu { position: relative; }
 .menu > summary { list-style: none; }
 .menu > summary::-webkit-details-marker { display: none; }
@@ -297,7 +297,7 @@ body[data-tab="planning"] .switch { display: none; }
 .menu-pop button:hover, .menu-pop button:focus-visible { background: var(--bg); }
 .menu-pop .danger { color: var(--bad); }
 body.signed { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
-.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: 1fr 1fr; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: 1fr 1fr 1fr; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
 .tabbar button { all: unset; position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 0 8px; font: 600 12px/1 var(--font-body); color: var(--muted); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .tabbar button[aria-current="page"] { color: var(--accent-ink); }
 .tabbar svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -391,6 +391,72 @@ button.shift { cursor: pointer; }
 .post-fb { background: var(--accent-soft); border-radius: 10px; padding: 9px 12px; }
 .post-fb small { font-size: 12px; font-weight: 600; color: var(--accent-ink); }
 .post-fb p { margin: 2px 0 0; font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* ---------- meeting tab ---------- */
+#meeting { padding-bottom: 40px; }
+.mt-head h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-stretch: 75%; font-size: 32px; text-transform: uppercase; line-height: 1; }
+.mt-head .note { margin: 6px 0 0; }
+.mt-pptnote { margin: -6px 0 0; text-align: center; }
+.mt-banner { margin: 0; background: var(--accent-soft); color: var(--ink); border-radius: 12px; padding: 12px 14px; font-size: 14.5px; }
+.mt-h2 { margin: 12px 0 0; font-size: 18px; font-weight: 700; }
+.mt-h2row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
+.mt-h2row .mt-h2 { margin: 0; }
+.mt-h2row .btn { padding: 8px 14px; }
+.mt-stores { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.mt-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.mt-name { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.mt-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.mt-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.mt-tile { background: var(--bg); border-radius: 10px; padding: 9px 10px; min-width: 0; }
+.mt-tile .l { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mt-tile .v { font-family: var(--font-display); font-weight: 700; font-stretch: 85%; font-size: 26px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.mt-tile .s { font-size: 12px; color: var(--muted); }
+.mt-top { font-size: 13.5px; color: var(--muted); margin: 0; }
+.mt-top b { color: var(--ink); font-weight: 600; }
+.mt-bars { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; align-items: end; height: 120px; }
+.mt-bar { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; height: 100%; min-width: 0; }
+.mt-bar i { display: block; width: 100%; max-width: 34px; border-radius: 4px 4px 0 0; background: var(--bar-muted); min-height: 2px; }
+.mt-bar.cur i { background: var(--mt-color, var(--accent)); }
+.mt-bar b { font: 500 10.5px/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+.mt-bar small { font-size: 10px; color: var(--muted); white-space: nowrap; }
+.mt-cmrow { display: flex; flex-direction: column; gap: 6px; }
+.mt-day { display: grid; grid-template-columns: 76px 1fr; gap: 2px 10px; font-size: 13.5px; padding: 8px 0; border-top: 1px dashed var(--line); }
+.mt-day b { font-weight: 600; }
+.mt-day .m { color: var(--muted); }
+.mt-day .fb { grid-column: 2; background: var(--accent-soft); border-radius: 8px; padding: 6px 8px; font-size: 13px; }
+.mt-goal { display: flex; justify-content: space-between; gap: 10px; font-size: 13.5px; padding: 6px 0; border-top: 1px dashed var(--line); }
+.mt-goal span:last-child { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mt-goal.ok span:last-child { color: var(--good); font-weight: 600; }
+.mt-act { display: flex; gap: 10px; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; margin-bottom: 8px; }
+.mt-act input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--good); flex: none; }
+.mt-act .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.mt-act .t span { font-size: 14.5px; overflow-wrap: anywhere; }
+.mt-act.done .t span { text-decoration: line-through; color: var(--muted); }
+.mt-act .t small { font-size: 12px; color: var(--muted); }
+.mt-act .x { all: unset; cursor: pointer; color: var(--muted); padding: 0 4px; font-size: 18px; line-height: 1; }
+.mt-rep { all: unset; box-sizing: border-box; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; font-weight: 600; }
+.mt-rep small { font-weight: 400; color: var(--muted); }
+.mt-settings { margin-top: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.report-view { position: fixed; inset: 0; z-index: 70; background: var(--bg); overflow-y: auto; padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 40px; }
+.rv-bar { position: sticky; top: 0; display: flex; justify-content: space-between; gap: 10px; padding: 6px 0 12px; background: var(--bg); z-index: 1; }
+.rv-body { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+.rv-body h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-stretch: 75%; font-size: 30px; text-transform: uppercase; line-height: 1.05; }
+.rv-body h2 { margin: 6px 0 0; font-size: 19px; }
+.rv-body h3 { margin: 4px 0 0; font-size: 15px; }
+.rv-body ul, .rv-body ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; font-size: 14.5px; }
+.rv-store { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px; break-inside: avoid; }
+.rv-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.rv-table th, .rv-table td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--grid); }
+.rv-table td.n, .rv-table th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rv-table .ok { color: var(--good); font-weight: 600; }
+.rv-table .ko { color: var(--bad); }
+@media print {
+  body > *:not(#report-view) { display: none !important; }
+  body.signed { padding: 0; background: #fff; }
+  .report-view { position: static; overflow: visible; padding: 0; background: #fff; }
+  .rv-bar { display: none; }
+  .rv-store { border-color: #ccc; }
+}
 </style>
 </head>
 <body>
@@ -615,8 +681,47 @@ button.shift { cursor: pointer; }
   <button type="button" class="fab" id="pl-add">Ajouter un shift</button>
 </main>
 
+<main class="wrap" id="meeting" hidden>
+  <div class="mt-head">
+    <h1>Réunion</h1>
+    <p class="note" id="mt-when"></p>
+  </div>
+  <button type="button" class="btn big" id="mt-ppt">Télécharger la présentation (PowerPoint)</button>
+  <p class="note mt-pptnote" id="mt-pptnote"></p>
+  <p class="mt-banner" id="mt-banner" hidden></p>
+
+  <h2 class="mt-h2">Cette semaine</h2>
+  <div class="mt-stores" id="mt-week"></div>
+
+  <h2 class="mt-h2">Semaine par semaine</h2>
+  <div class="mt-stores" id="mt-trend"></div>
+
+  <h2 class="mt-h2">Travail du community manager</h2>
+  <div id="mt-cm"></div>
+
+  <h2 class="mt-h2" id="mt-goals-title">Objectifs du mois</h2>
+  <div class="mt-stores" id="mt-goals"></div>
+
+  <div class="mt-h2row"><h2 class="mt-h2">Actions de la réunion</h2><button type="button" class="btn ghost" id="mt-add" hidden>+ Ajouter</button></div>
+  <div id="mt-actions"></div>
+
+  <h2 class="mt-h2">Rapports mensuels</h2>
+  <div id="mt-reports"></div>
+
+  <div class="mt-settings" id="mt-settings" hidden>
+    <label class="fld"><span>Jour de la réunion</span><select id="mt-day"></select></label>
+    <p class="note">La présentation couvre les 7 jours qui précèdent la dernière mise à jour des chiffres. Pour qu'elle soit à jour le jour de la réunion, la mise à jour automatique doit tourner ce jour-là, le matin.</p>
+  </div>
+</main>
+
+<section class="report-view" id="report-view" hidden>
+  <div class="rv-bar"><button type="button" class="btn ghost" id="rv-close">Fermer</button><button type="button" class="btn" id="rv-print">Exporter en PDF</button></div>
+  <div id="rv-body" class="rv-body"></div>
+</section>
+
 <nav class="tabbar" aria-label="Sections">
   <button type="button" data-tab="stats" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V11M10 20V4M16 20v-7M21 20H3"/></svg><span>Statistiques</span></button>
+  <button type="button" data-tab="meeting"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zM8 20h8M12 16v4"/><path d="M7 12l3-3 2 2 5-5"/></svg><span>Réunion</span></button>
   <button type="button" data-tab="planning"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Planning</span><i class="badge" id="tab-badge" hidden></i></button>
 </nav>
 </div>
@@ -1086,6 +1191,8 @@ window.startDashboard = (DATA) => {
   if (!DATA.stores.some((s) => s.id === start)) start = DATA.stores[0].id;
   render(start);
   window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (DATA.stores.some((s) => s.id === h) && h !== current.id) render(h); });
+  window.MR = { DATA, GOALS, reached, goalsOf, starsOf, starsEl, monthName, of };
+  document.dispatchEvent(new Event('mr-ready'));
 };
 </script>
 <script>
@@ -1322,10 +1429,11 @@ window.startDashboard = (DATA) => {
   // ---------- tabs ----------
   function setTab(tab) {
     document.body.dataset.tab = tab;
-    $('#stats').hidden = tab !== 'stats'; $('#planning').hidden = tab !== 'planning';
+    $('#stats').hidden = tab !== 'stats'; $('#planning').hidden = tab !== 'planning'; $('#meeting').hidden = tab !== 'meeting';
     document.querySelectorAll('.tabbar button').forEach((b) => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
     window.scrollTo(0, 0);
     if (tab === 'planning') loadWeek();
+    if (tab === 'meeting' && window.Meeting) window.Meeting.open();
   }
   document.querySelectorAll('.tabbar button').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
 
@@ -1540,6 +1648,7 @@ window.startDashboard = (DATA) => {
     $('#menu-name').textContent = me.firstName; $('#menu-role').textContent = ROLE[me.role];
     $('#menu-reset').hidden = $('#menu-invites').hidden = $('#menu-remove').hidden = me.role !== 'direction';
     $('.tabbar [data-tab="planning"] span').textContent = isCm() ? 'Mon planning' : 'Planning';
+    window.App = { api, openSheet, toast, el, user: () => me, setTab };
     const deep = location.hash === '#planning';
     // a shift notification opens the app on /#planning, even when it is already open
     window.addEventListener('hashchange', () => { if (location.hash === '#planning') setTab('planning'); });
@@ -1551,5 +1660,6 @@ window.startDashboard = (DATA) => {
   })();
 })();
 </script>
+<script src="/assets/meeting.js"></script>
 </body>
 </html>
