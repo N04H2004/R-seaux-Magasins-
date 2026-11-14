@@ -1,7 +1,8 @@
 // GET: the active accounts and the current invitation codes (direction only).
 // POST 'invite' {role}: generate a new invitation code for that role (direction only); the previous one stops working. POST {action}: 'change' my own code, 'reset' someone's code (direction only),
+// 'profile' {email} sets my own e-mail address (empty clears it), used for meeting invitations;
 // 'remove' an account (direction only): it can no longer sign in, its first name is freed, its timesheet stays readable.
-const { redis, err, fail, jsonBody, newInvite, currentInvites, normName, checkCode, setCode, getUser, saveUser, activeUsers, publicUser, requireUser } = require('./_lib');
+const { redis, err, fail, jsonBody, newInvite, currentInvites, normName, checkCode, setCode, getUser, saveUser, activeUsers, publicUser, requireUser, EMAIL } = require('./_lib');
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
@@ -17,6 +18,13 @@ module.exports = async (req, res) => {
       if (!checkCode(b.oldCode, me)) throw err(401, 'Ancien code incorrect');
       setCode(me, b.code); await saveUser(me);
       return res.json({ ok: true });
+    }
+    if (b.action === 'profile') {
+      const me = await requireUser(req);
+      const email = String(b.email || '').trim().toLowerCase().slice(0, 120);
+      if (email && !EMAIL.test(email)) throw err(400, 'Adresse e-mail invalide');
+      me.email = email; await saveUser(me);
+      return res.json({ ok: true, user: publicUser(me) });
     }
     if (b.action === 'invite') {
       await requireUser(req, 'direction');

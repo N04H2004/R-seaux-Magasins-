@@ -4,9 +4,12 @@
 // POST {action}: 'day' {day: 1–7} sets the meeting weekday (direction);
 //   'add' {text, owner: 'cm'|'direction', store} adds an action (direction);
 //   'update' {id, text?, done?} edits an action (direction) or ticks it (the CM, for the actions given to the CM);
-//   'delete' {id} (direction).
+//   'delete' {id} (direction);
+//   'plan' {date, time, duration, withCm} records the next meeting (direction), 'unplan' forgets it.
+//   GET also returns `planned` (the next planned meeting, until its day has passed) and, for the direction,
+//   `people`: the active accounts with their e-mail address, to invite them.
 const crypto = require('crypto');
-const { redis, err, fail, jsonBody, allUsers, publicUser, requireUser, parisNow } = require('./_lib');
+const { redis, err, fail, jsonBody, allUsers, activeUsers, publicUser, requireUser, parisNow } = require('./_lib');
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const hash = async (key) => {
@@ -44,7 +47,10 @@ module.exports = async (req, res) => {
       const work = [];
       for (const cm of cms) { const w = await cmWork(cm, from, to); if (!cm.removed || w.shifts || w.postedDays) work.push(w); }
       const actions = (await hash('actions')).sort((a, b) => (a.done - b.done) || b.createdAt.localeCompare(a.createdAt));
-      return res.json({ ok: true, meetingDay: +(await redis('GET', 'meeting:day')) || 5, today, work, actions });
+      const raw = await redis('GET', 'meeting:next');
+      const planned = raw && JSON.parse(raw).date >= today ? JSON.parse(raw) : null;
+      const people = isDir ? (await activeUsers()).map(publicUser) : undefined;
+      return res.json({ ok: true, meetingDay: +(await redis('GET', 'meeting:day')) || 5, today, planned, people, work, actions });
     }
     if (req.method !== 'POST') throw err(405, 'Méthode non permise');
     const b = await jsonBody(req);
@@ -55,6 +61,22 @@ module.exports = async (req, res) => {
       if (!(day >= 1 && day <= 7)) throw err(400, 'Jour invalide');
       await redis('SET', 'meeting:day', String(day));
       return res.json({ ok: true, meetingDay: day });
+    }
+    if (b.action === 'plan') {
+      if (!isDir) throw err(403, 'Réservé à la direction');
+      if (!DATE.test(b.date || '') || isNaN(Date.parse(b.date + 'T12:00:00Z'))) throw err(400, 'Date invalide');
+      if (b.date < parisNow().date) throw err(400, 'Cette date est déjà passée');
+      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(b.time || '')) throw err(400, 'Heure invalide');
+      const duration = Math.round(+b.duration || 45);
+      if (!(duration >= 15 && duration <= 240)) throw err(400, 'Durée invalide');
+      const planned = { date: b.date, time: b.time, duration, withCm: !!b.withCm, by: me.firstName, at: now };
+      await redis('SET', 'meeting:next', JSON.stringify(planned));
+      return res.json({ ok: true, planned });
+    }
+    if (b.action === 'unplan') {
+      if (!isDir) throw err(403, 'Réservé à la direction');
+      await redis('DEL', 'meeting:next');
+      return res.json({ ok: true });
     }
     if (b.action === 'add') {
       if (!isDir) throw err(403, 'Réservé à la direction');

@@ -89,7 +89,9 @@ async function allUsers() {
   const ids = (await redis('SMEMBERS', 'users')) || [];
   return (await Promise.all(ids.map(getUser))).filter(Boolean);
 }
-const publicUser = (u) => ({ id: u.id, firstName: u.firstName, role: u.role, ...(u.removed ? { removed: true } : {}) });
+// email: given by the person in their profile, used for meeting invitations (seen only by themself and the direction)
+const publicUser = (u) => ({ id: u.id, firstName: u.firstName, role: u.role, email: u.email || '', ...(u.removed ? { removed: true } : {}) });
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // A removed account keeps its record (so the old timesheet stays readable) but can no longer sign in.
 const activeUsers = async () => (await allUsers()).filter((u) => !u.removed);
 
@@ -169,7 +171,7 @@ async function notifyUsers(ids, payload) {
 
 module.exports = {
   VAPID_PUBLIC_KEY, redis, err, fail, readBody, jsonBody,
-  roleForInvite, newInvite, currentInvites, normName, cleanName, checkCode, setCode, getUser, saveUser, allUsers, activeUsers, publicUser,
+  roleForInvite, newInvite, currentInvites, normName, cleanName, checkCode, setCode, getUser, saveUser, allUsers, activeUsers, publicUser, EMAIL,
   startSession, endSession, currentUser, requireUser,
   parisNow, sundayOf, weekLocked, push, validSub, notifyUsers,
 };

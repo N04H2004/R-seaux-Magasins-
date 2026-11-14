@@ -482,6 +482,7 @@ button.shift { cursor: pointer; }
         <summary class="avatar" id="avatar" aria-label="Mon compte">?</summary>
         <div class="menu-pop">
           <div class="menu-who"><b id="menu-name"></b><small id="menu-role"></small></div>
+          <button type="button" data-act="email">Mon adresse e-mail</button>
           <button type="button" data-act="code">Changer mon code</button>
           <button type="button" data-act="reset" id="menu-reset" hidden>Réinitialiser le code d'un compte</button>
           <button type="button" data-act="invites" id="menu-invites" hidden>Codes d'invitation</button>
@@ -686,6 +687,7 @@ button.shift { cursor: pointer; }
     <h1>Réunion</h1>
     <p class="note" id="mt-when"></p>
   </div>
+  <button type="button" class="btn ghost" id="mt-plan" hidden>Planifier la réunion</button>
   <button type="button" class="btn big" id="mt-ppt">Télécharger la présentation (PowerPoint)</button>
   <p class="note mt-pptnote" id="mt-pptnote"></p>
   <p class="mt-banner" id="mt-banner" hidden></p>
@@ -709,8 +711,8 @@ button.shift { cursor: pointer; }
   <div id="mt-reports"></div>
 
   <div class="mt-settings" id="mt-settings" hidden>
-    <label class="fld"><span>Jour de la réunion</span><select id="mt-day"></select></label>
-    <p class="note">La présentation porte sur la semaine complète (du lundi au dimanche) qui précède la semaine de la réunion. La mise à jour automatique du lundi fournit ces chiffres, quel que soit le jour de la réunion.</p>
+    <label class="fld"><span>Jour habituel de la réunion</span><select id="mt-day"></select></label>
+    <p class="note">Utilisé quand aucune réunion n'est planifiée. La présentation porte sur la semaine complète (du lundi au dimanche) qui précède la semaine de la réunion. La mise à jour automatique du lundi fournit ces chiffres, quel que soit le jour de la réunion.</p>
   </div>
 </main>
 
@@ -1320,6 +1322,12 @@ window.startDashboard = (DATA) => {
     menu.open = false;
     const act = b.dataset.act;
     if (act === 'logout') { try { await api('/api/auth', { action: 'logout' }); } catch (e) {} location.reload(); }
+    if (act === 'email') openSheet({
+      title: 'Mon adresse e-mail',
+      sub: 'Elle sert à t\'inviter aux réunions (Google Agenda). Seule la direction la voit. Laisse vide pour l\'effacer.',
+      fields: [['email', 'Adresse e-mail', 'email', null, me.email || '']],
+      submit: async (v) => { const r = await api('/api/users', { action: 'profile', email: v.email }); me.email = r.user.email; toast(me.email ? 'Adresse enregistrée.' : 'Adresse effacée.'); },
+    });
     if (act === 'code') openSheet({
       title: 'Changer mon code',
       fields: [['oldCode', 'Code actuel', 'password'], ['code', 'Nouveau code (6 caractères minimum)', 'password'], ['code2', 'Confirme le nouveau code', 'password']],

@@ -49,12 +49,12 @@
     let r;
     try {
       const info = await window.App.api('/api/meeting');
-      const meeting0 = nextMeeting(info.today, info.meetingDay);
+      const meeting0 = info.planned ? info.planned.date : nextMeeting(info.today, info.meetingDay);
       const w0 = weekInfo(DATA, meeting0);
       if (!w0.cur) { $('#mt-when').textContent = 'L\'historique des semaines n\'est pas encore disponible.'; return; }
       r = await window.App.api('/api/meeting?' + new URLSearchParams({ from: w0.cur.start, to: w0.cur.end }));
     } catch (x) { $('#mt-when').textContent = 'Impossible de charger la réunion : ' + x.message; return; }
-    const meeting = nextMeeting(r.today, r.meetingDay);
+    const meeting = r.planned ? r.planned.date : nextMeeting(r.today, r.meetingDay);
     const wk = weekInfo(DATA, meeting);
     const pm = prevMonth(monthOf(meeting));
     // the first meeting of a month adds the report of the month before; ?mois=AAAA-MM forces a given month
@@ -62,13 +62,16 @@
     const monthly = forced && DATA.reports && DATA.reports[forced] ? forced : +meeting.slice(8, 10) <= 7 && DATA.reports && DATA.reports[pm] ? pm : null;
     S = { DATA, wk, r, meeting, monthly, me, isDir: me.role === 'direction' };
 
-    $('#mt-when').textContent = 'Prochaine réunion : ' + fLong.format(D(meeting)) + ' · semaine du ' + fShort.format(D(wk.cur.start)) + ' au ' + fShort.format(D(wk.cur.end));
+    $('#mt-when').textContent = (r.planned ? 'Réunion planifiée : ' + fLong.format(D(meeting)) + ' à ' + r.planned.time.replace(':', ' h ') : 'Prochaine réunion : ' + fLong.format(D(meeting)) + ' (non planifiée)') + ' · semaine du ' + fShort.format(D(wk.cur.start)) + ' au ' + fShort.format(D(wk.cur.end));
     $('#mt-pptnote').textContent = sentence('À ouvrir sur ordinateur, avec les chiffres jusqu\'au ' + fShort.format(D(wk.cur.end)) + (monthly ? ' et le rapport ' + window.MR.of(monthly) : ''));
     const banner = [];
     if (wk.stale) banner.push('Les chiffres de la semaine du ' + fShort.format(D(addDays(wk.expectedEnd, -6))) + ' au ' + fShort.format(D(wk.expectedEnd)) + ' arriveront avec la prochaine mise à jour (le lundi) : en attendant, la semaine affichée est la dernière complète.');
     if (monthly) banner.push('Première réunion du mois : le rapport ' + window.MR.of(monthly) + ' est ajouté à la présentation.');
+    if (!me.email) banner.push('Ajoute ton adresse e-mail (menu en haut à droite → Mon adresse e-mail) pour recevoir les invitations aux réunions.');
     $('#mt-banner').hidden = !banner.length;
     $('#mt-banner').textContent = banner.join(' ');
+    $('#mt-plan').hidden = !S.isDir;
+    $('#mt-plan').textContent = r.planned ? 'Modifier la réunion planifiée' : 'Planifier la réunion';
     renderWeek(); renderTrend(); renderCm(); renderGoals(); renderActions(); renderReports(); renderSettings();
   }
 
@@ -191,6 +194,56 @@
     okLabel: 'Ajouter',
     submit: async (v) => { await window.App.api('/api/meeting', { action: 'add', text: v.text, owner: v.owner, store: v.store || null }); window.App.toast('Action ajoutée.'); open(); },
   }));
+
+  // ---------- planning the meeting: a prefilled Google Agenda event ----------
+  const pad = (n) => String(n).padStart(2, '0');
+  const stamp = (date, mins) => { const t = D(date).getTime() - 12 * 36e5 + mins * 6e4, d = new Date(t); return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + '00'; };
+  function calendarUrl(p, guests) {
+    const [h, m] = p.time.split(':').map(Number), start = h * 60 + m;
+    const wk = weekInfo(S.DATA, p.date), mon = +p.date.slice(8, 10) <= 7 && S.DATA.reports && S.DATA.reports[prevMonth(monthOf(p.date))] ? prevMonth(monthOf(p.date)) : null;
+    const details = ['Point hebdomadaire sur les réseaux sociaux d\'Intermarché Cessole et de Netto Temple.',
+      sentence('Chiffres de la semaine du ' + fShort.format(D(addDays(wk.expectedEnd, -6))) + ' au ' + fShort.format(D(wk.expectedEnd)) + (mon ? ', avec le rapport ' + window.MR.of(mon) : '')),
+      '', 'Présentation : ' + location.origin + '/ (onglet Réunion)'].join('\n');
+    const q = new URLSearchParams({ action: 'TEMPLATE', text: 'Réunion réseaux sociaux', dates: stamp(p.date, start) + '/' + stamp(p.date, start + p.duration), ctz: 'Europe/Paris', details, vcon: 'meet' });
+    if (guests.length) q.set('add', guests.join(','));
+    return 'https://calendar.google.com/calendar/render?' + q;
+  }
+  $('#mt-plan').addEventListener('click', () => {
+    const { r } = S;
+    const p = r.planned || { date: S.meeting, time: '10:00', duration: 45 };
+    const firstOfMonth = (d) => +d.slice(8, 10) <= 7;
+    const dir = r.people.filter((u) => u.role === 'direction'), cms = r.people.filter((u) => u.role === 'cm');
+    const names = (l) => l.map((u) => u.firstName).join(', ') || 'personne';
+    const missing = r.people.filter((u) => !u.email).map((u) => u.firstName);
+    window.App.openSheet({
+      title: r.planned ? 'Modifier la réunion' : 'Planifier la réunion',
+      sub: 'Google Agenda s\'ouvre avec la réunion préremplie : vérifie que Google Meet est ajouté, puis enregistre pour envoyer les invitations.\n\nDirection, invitée d\'office : ' + names(dir) + '.\nCommunity manager : ' + names(cms) + ' (proposé pour la première réunion du mois).'
+        + (missing.length ? '\n\nSans adresse e-mail (pas invités) : ' + missing.join(', ') + '. Chacun l\'ajoute dans son menu → Mon adresse e-mail.' : ''),
+      fields: [[['date', 'Date', 'date', null, p.date], ['time', 'Heure', 'time', null, p.time]],
+        [['duration', 'Durée', 'select', [['30', '30 min'], ['45', '45 min'], ['60', '1 h'], ['90', '1 h 30']], String(p.duration)],
+          ['withCm', 'Inviter le CM', 'select', [['1', 'Oui'], ['0', 'Non']], (r.planned ? r.planned.withCm : firstOfMonth(p.date)) ? '1' : '0']]],
+      okLabel: 'Ouvrir Google Agenda', noFocus: true,
+      remove: r.planned ? async () => { await window.App.api('/api/meeting', { action: 'unplan' }); window.App.toast('Réunion retirée de l\'appli (pense à la supprimer aussi dans Google Agenda).'); open(); } : null,
+      submit: async (v) => {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(v.date)) throw new Error('Choisis une date.');
+        if (!/^\d{2}:\d{2}$/.test(v.time)) throw new Error('Choisis une heure.');
+        if (v.date < r.today) throw new Error('Cette date est déjà passée.');
+        const plan = { date: v.date, time: v.time, duration: +v.duration, withCm: v.withCm === '1' };
+        const guests = dir.concat(plan.withCm ? cms : []).map((u) => u.email).filter(Boolean);
+        // open the tab right away, inside the tap, so the browser does not block it
+        const win = window.open(calendarUrl(plan, guests), '_blank');
+        if (win) win.opener = null;
+        await window.App.api('/api/meeting', Object.assign({ action: 'plan' }, plan));
+        window.App.toast('Réunion planifiée le ' + fLong.format(D(plan.date)) + ' à ' + plan.time.replace(':', ' h ') + '.');
+        if (!win) location.href = calendarUrl(plan, guests); // pop-up blocked: open it here
+        open();
+      },
+    });    // the CM is proposed for the first meeting of a month: follow the chosen date until the choice is changed by hand
+    const dateIn = document.querySelector('#sheet [name=date]'), cmIn = document.querySelector('#sheet [name=withCm]');
+    let touched = !!r.planned;
+    cmIn.addEventListener('change', () => { touched = true; });
+    dateIn.addEventListener('change', () => { if (!touched && dateIn.value) cmIn.value = firstOfMonth(dateIn.value) ? '1' : '0'; });
+  });
 
   // ---------- settings ----------
   function renderSettings() {
