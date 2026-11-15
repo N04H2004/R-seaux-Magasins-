@@ -72,6 +72,9 @@
     $('#mt-banner').textContent = banner.join(' ');
     $('#mt-plan').hidden = !S.isDir;
     $('#mt-plan').textContent = r.planned ? 'Modifier la réunion planifiée' : 'Planifier la réunion';
+    const span = 'du lundi ' + fShort.format(D(wk.cur.start)).replace(/ .*/, '') + ' au dimanche ' + fShort.format(D(wk.cur.end));
+    $('#mt-week-title').textContent = 'Semaine présentée : ' + span;
+    $('#mt-cm-title').textContent = 'Travail du CM : ' + span;
     renderWeek(); renderTrend(); renderCm(); renderGoals(); renderActions(); renderReports(); renderSettings();
   }
 
@@ -95,7 +98,7 @@
       card.append(tiles);
       const top = el('p', 'mt-top');
       if (c.topPost) { top.append('Meilleur post : '); top.append(el('b', '', c.topPost.title)); top.append(' · ' + int(c.topPost.views) + ' vues'); }
-      else top.textContent = 'Aucune publication cette semaine.';
+      else top.textContent = 'Aucune publication cette semaine-là.';
       card.append(top);
       return card;
     }));
@@ -123,7 +126,7 @@
 
   function renderCm() {
     const { r, wk } = S;
-    if (!r.work.length) { $('#mt-cm').replaceChildren(el('p', 'empty', 'Aucun community manager inscrit pour cette semaine.')); return; }
+    if (!r.work.length) { $('#mt-cm').replaceChildren(el('p', 'empty', 'Aucun community manager inscrit sur cette semaine-là.')); return; }
     $('#mt-cm').replaceChildren(...r.work.map((w) => {
       const card = el('section', 'mt-card');
       card.append(el('div', 'mt-name', w.cm.firstName + (w.cm.removed ? ' (ancien compte)' : '')));
@@ -353,7 +356,7 @@
     DATA.stores.forEach((s, i) => chip(t, s.id, M + i * 3.0, 4.8));
 
     // 2. the week at a glance
-    const s2 = slide('La semaine en un coup d\'œil');
+    const s2 = slide('Semaine du ' + fShort.format(D(wk.cur.start)) + ' au ' + fShort.format(D(wk.cur.end)) + ' en un coup d\'œil');
     const cw = (W - 2 * M - 0.4) / 2;
     DATA.stores.forEach((s, i) => {
       const x = M + i * (cw + 0.4), c = wk.cur.stores[s.id], p = wk.prev && wk.prev.stores[s.id];
@@ -362,7 +365,7 @@
       stat(s2, x + 0.3, 2.3, 1.9, int(c.views), 'vues', p ? pct(c.views, p.views) + ' vs sem. préc.' : '', p ? (up ? GOOD : BAD) : null);
       stat(s2, x + 2.3, 2.3, 1.9, c.followersGained == null ? '—' : '+' + int(c.followersGained), 'nouveaux abonnés', int(c.followers) + ' au total');
       stat(s2, x + 4.3, 2.3, 1.6, int(c.posts), 'publications', p ? p.posts + ' la semaine d\'avant' : '');
-      s2.addText([{ text: 'Meilleur post de la semaine', options: { bold: true, breakLine: true, fontSize: 13, color: MUTED } }, { text: c.topPost ? c.topPost.title + ' · ' + c.topPost.format + ' · ' + int(c.topPost.views) + ' vues' : 'Aucune publication cette semaine', options: { fontSize: 16, color: INK } }],
+      s2.addText([{ text: 'Meilleur post de la semaine', options: { bold: true, breakLine: true, fontSize: 13, color: MUTED } }, { text: c.topPost ? c.topPost.title + ' · ' + c.topPost.format + ' · ' + int(c.topPost.views) + ' vues' : 'Aucune publication cette semaine-là', options: { fontSize: 16, color: INK } }],
         { x: x + 0.3, y: 4.05, w: cw - 0.6, h: 1.0, margin: 0, valign: 'top' });
       s2.addText([{ text: 'Ce qu\'il faut retenir', options: { bold: true, breakLine: true, fontSize: 13, color: MUTED } }].concat((s.summary || []).slice(0, 2).map((x, j, a) => ({ text: x, options: { bullet: true, fontSize: 13, color: INK, breakLine: j < a.length - 1 } }))),
         { x: x + 0.3, y: 5.05, w: cw - 0.6, h: 1.55, margin: 0, valign: 'top', paraSpaceAfter: 3 });
@@ -380,7 +383,7 @@
       const posts = (s.posts || []).filter((p) => p.time.slice(0, 10) >= wk.cur.start && p.time.slice(0, 10) <= wk.cur.end).sort((a, b) => b.views - a.views);
       card(sl, 8.2, 1.4, W - M - 8.2, 5.3);
       sl.addText('Publications de la semaine', { x: 8.45, y: 1.55, w: 4, h: 0.4, fontSize: 15, bold: true, color: INK, margin: 0 });
-      if (!posts.length) sl.addText('Aucune publication cette semaine.', { x: 8.45, y: 2.05, w: 4, h: 0.4, fontSize: 13, color: MUTED, margin: 0 });
+      if (!posts.length) sl.addText('Aucune publication cette semaine-là.', { x: 8.45, y: 2.05, w: 4, h: 0.4, fontSize: 13, color: MUTED, margin: 0 });
       posts.slice(0, 5).forEach((p, j) => sl.addText([
         { text: p.title, options: { bold: true, fontSize: 13, color: INK, breakLine: true } },
         { text: p.format + ' · ' + int(p.views) + ' vues · ' + int(p.interactions) + ' réactions' + (p.shares ? ' · ' + p.shares + ' partages' : '') + (p.watch != null ? ' · ' + String(p.watch).replace('.', ',') + ' s vus' : ''), options: { fontSize: 11.5, color: MUTED } },
@@ -389,7 +392,7 @@
 
     // 5. CM work
     const s5 = slide('Travail du community manager');
-    if (!r.work.length) s5.addText('Aucun community manager inscrit pour cette semaine.', { x: M, y: 1.5, w: 10, h: 0.5, fontSize: 16, color: MUTED, margin: 0 });
+    if (!r.work.length) s5.addText('Aucun community manager inscrit sur cette semaine-là.', { x: M, y: 1.5, w: 10, h: 0.5, fontSize: 16, color: MUTED, margin: 0 });
     const w0 = r.work[0];
     if (w0) {
       card(s5, M, 1.35, 3.3, 5.35);
